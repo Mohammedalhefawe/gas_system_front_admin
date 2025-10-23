@@ -1,33 +1,135 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
-import 'package:gas_admin_app/presentation/custom_widgets/app_button.dart';
-import 'package:gas_admin_app/presentation/pages/add_order_page/add_order_page.dart';
+import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
 import 'package:gas_admin_app/presentation/pages/order_details_page/order_details_page.dart';
 import 'package:gas_admin_app/presentation/pages/orders_page/orders_controller.dart';
-import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
+import 'package:gas_admin_app/presentation/util/date_converter.dart'
+    show DateConverter;
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
-class OrdersPage extends GetView<OrdersPageController> {
-  const OrdersPage({super.key});
+class DriverOrdersPage extends StatefulWidget {
+  final int? driverId; // Optional driverId for specific driver orders
+
+  const DriverOrdersPage({super.key, this.driverId});
+
+  @override
+  State<DriverOrdersPage> createState() => _DriverOrdersPageState();
+}
+
+class _DriverOrdersPageState extends State<DriverOrdersPage>
+    with SingleTickerProviderStateMixin {
+  late DriverOrdersController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(DriverOrdersController(driverId: widget.driverId));
+  }
 
   @override
   Widget build(BuildContext context) {
-    Get.put(OrdersPageController());
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: ColorManager.colorGrey0,
+        appBar: NormalAppBar(title: 'DriverOrders'.tr, backIcon: true),
+        body: _buildOrdersView(
+          context,
+          controller.myOrders,
+          controller.myOrdersLoadingState,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrdersView(
+    BuildContext context,
+    RxList<OrderModel> orders,
+    Rx<LoadingState> loadingState,
+  ) {
     return Obx(() {
-      if (controller.loadingState.value == LoadingState.loading) {
-        return _buildShimmerList();
+      if (loadingState.value == LoadingState.loading) {
+        return _buildShimmer();
       }
-      if (controller.loadingState.value == LoadingState.doneWithNoData) {
+      if (loadingState.value == LoadingState.hasError) {
+        return _buildErrorState(context);
+      }
+      if (orders.isEmpty) {
         return _buildEmptyState();
       }
-      return _buildOrdersList();
+      return RefreshIndicator(
+        onRefresh: controller.fetchDriverOrders,
+        color: ColorManager.colorPrimary,
+        backgroundColor: ColorManager.colorWhite,
+        child: ListView.separated(
+          padding: const EdgeInsets.all(AppPadding.p12),
+          itemCount: orders.length,
+          separatorBuilder: (context, index) =>
+              const SizedBox(height: AppSize.s8),
+          itemBuilder: (context, index) {
+            final order = orders[index];
+            return _buildOrderCard(context, order);
+          },
+        ),
+      );
     });
+  }
+
+  Widget _buildOrderCard(BuildContext context, OrderModel order) {
+    return GestureDetector(
+      onTap: () => Get.to(() => DriverOrderDetailsPage(), arguments: order),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorManager.colorWhite,
+          borderRadius: BorderRadius.circular(AppSize.s12),
+        ),
+        child: Column(
+          children: [
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppPadding.p16,
+                vertical: AppPadding.p8,
+              ),
+              title: Text(
+                '#${order.orderId}',
+                style: TextStyle(
+                  fontSize: FontSize.s16,
+                  fontWeight: FontWeight.w600,
+                  color: ColorManager.colorFontPrimary,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppSize.s4),
+                  Text(
+                    DateConverter.formatDateOnly(order.orderDate),
+                    style: TextStyle(
+                      fontSize: FontSize.s12,
+                      color: ColorManager.colorDoveGray600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSize.s4),
+                  Text(
+                    '${"TotalPrice".tr}  ${(double.parse(order.totalAmount) + double.parse(order.deliveryFee)).toStringAsFixed(0)} ${'SP'.tr}',
+                    style: TextStyle(
+                      fontSize: FontSize.s14,
+                      fontWeight: FontWeight.w600,
+                      color: ColorManager.colorFontPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              trailing: buildStatusBadge(order.orderStatus),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildEmptyState() {
@@ -38,42 +140,27 @@ class OrdersPage extends GetView<OrdersPageController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: AppSize.s120,
-              height: AppSize.s120,
+              width: AppSize.s100,
+              height: AppSize.s100,
               decoration: BoxDecoration(
-                color: ColorManager.colorPrimary.withOpacity(0.1),
+                color: ColorManager.colorPrimary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.shopping_bag_outlined,
-                size: AppSize.s60,
+                Icons.inventory_2_outlined,
+                size: 50,
                 color: ColorManager.colorPrimary,
               ),
             ),
-            const SizedBox(height: AppSize.s28),
+            const SizedBox(height: AppSize.s24),
             Text(
-              'NoOrders'.tr,
-              style: TextStyle(
-                fontSize: FontSize.s24,
-                fontWeight: FontWeight.w700,
-                color: ColorManager.colorFontPrimary,
-              ),
-            ),
-            const SizedBox(height: AppSize.s12),
-            Text(
-              'NoOrdersPrompt'.tr,
+              'NoDriverOrders'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: FontSize.s16,
-                color: ColorManager.colorDoveGray600,
-                height: 1.5,
+                fontSize: FontSize.s18,
+                color: ColorManager.colorFontPrimary,
+                fontWeight: FontWeight.w600,
               ),
-            ),
-            const SizedBox(height: AppSize.s30),
-            AppButton(
-              onPressed: () => Get.to(() => const AddOrderPage()),
-              text: 'StartShopping'.tr,
-              backgroundColor: ColorManager.colorPrimary,
             ),
           ],
         ),
@@ -81,240 +168,109 @@ class OrdersPage extends GetView<OrdersPageController> {
     );
   }
 
-  Widget _buildOrdersList() {
-    return Column(
-      children: [
-        const SizedBox(height: AppSize.s8),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: controller.fetchOrders,
-            color: ColorManager.colorPrimary,
-            backgroundColor: ColorManager.colorWhite,
-            child: ListView.separated(
-              // padding: const EdgeInsets.all(AppPadding.p16),
-              itemCount: controller.orders.length,
-              itemBuilder: (context, index) {
-                final order = controller.orders[index];
-                return Column(
-                  children: [
-                    _buildOrderCard(context, order),
-                    if (index == controller.orders.length - 1)
-                      const SizedBox(height: AppSize.s8),
-                  ],
-                );
-              },
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: AppSize.s8),
+  Widget _buildErrorState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: AppSize.s60,
+            color: ColorManager.colorDoveGray600,
+          ),
+          const SizedBox(height: AppSize.s16),
+          Text(
+            'FailedToLoadOrders'.tr,
+            style: TextStyle(
+              fontSize: FontSize.s18,
+              color: ColorManager.colorDoveGray600,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: AppSize.s12),
+          GestureDetector(
+            onTap: controller.fetchDriverOrders,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.refresh, color: ColorManager.colorDoveGray600),
+                SizedBox(width: AppSize.s8),
+                Text(
+                  'TryAgain'.tr,
+                  style: TextStyle(
+                    fontSize: FontSize.s16,
+                    color: ColorManager.colorDoveGray600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, OrderModel order) {
-    final totalAmount =
-        (double.parse(order.totalAmount) + double.parse(order.deliveryFee))
-            .toStringAsFixed(0);
-
-    return InkWell(
-      onTap: () => Get.to(() => OrderDetailsPage(), arguments: order),
-      borderRadius: BorderRadius.circular(AppSize.s16),
-      child: Container(
-        decoration: BoxDecoration(color: ColorManager.colorWhite),
-        padding: const EdgeInsets.all(AppPadding.p20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildShimmer() {
+    return Padding(
+      padding: const EdgeInsets.all(AppPadding.p16),
+      child: Shimmer.fromColors(
+        baseColor: ColorManager.colorGrey2.withValues(alpha: 0.3),
+        highlightColor: ColorManager.colorGrey2.withValues(alpha: 0.1),
+        child: ListView.separated(
+          itemCount: 3,
+          separatorBuilder: (context, index) =>
+              const SizedBox(height: AppSize.s8),
+          itemBuilder: (context, index) => Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppSize.s12),
+            ),
+            child: Column(
               children: [
-                Expanded(
-                  child: Column(
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p16,
+                    vertical: AppPadding.p8,
+                  ),
+                  title: Container(width: 100, height: 16, color: Colors.white),
+                  subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Order #${order.orderId}',
-                        style: TextStyle(
-                          fontSize: FontSize.s18,
-                          fontWeight: FontWeight.w700,
-                          color: ColorManager.colorFontPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: AppSize.s4),
-                      Text(
-                        order.orderDate,
-                        style: TextStyle(
-                          fontSize: FontSize.s14,
-                          color: ColorManager.colorDoveGray600,
-                        ),
-                      ),
+                      const SizedBox(height: AppSize.s8),
+                      Container(width: 150, height: 12, color: Colors.white),
+                      const SizedBox(height: AppSize.s8),
+                      Container(width: 100, height: 14, color: Colors.white),
+                    ],
+                  ),
+                  trailing: Container(
+                    width: 80,
+                    height: 30,
+                    color: Colors.white,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p16,
+                    vertical: AppPadding.p8,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(width: 100, height: 40, color: Colors.white),
+                      const SizedBox(width: AppSize.s8),
+                      Container(width: 100, height: 40, color: Colors.white),
                     ],
                   ),
                 ),
-                buildStatusBadge(order.orderStatus),
               ],
             ),
-
-            const SizedBox(height: AppSize.s16),
-
-            // Address Section
-            Row(
-              children: [
-                Assets.icons.locationIcon.svg(
-                  width: 20,
-                  height: 20,
-                  colorFilter: ColorFilter.mode(
-                    ColorManager.colorDoveGray600,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: AppSize.s8),
-                Expanded(
-                  child: Text(
-                    order.address.addressName ?? order.address.address,
-                    style: TextStyle(
-                      fontSize: FontSize.s14,
-                      color: ColorManager.colorDoveGray600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: AppSize.s16),
-
-            // Divider
-            Container(
-              height: 1,
-              color: ColorManager.colorGrey2.withValues(alpha: .1),
-            ),
-
-            const SizedBox(height: AppSize.s16),
-
-            // Price Breakdown
-            _buildPriceRow(
-              'Subtotal',
-              '${double.parse(order.totalAmount).toStringAsFixed(0)} ${'SP'.tr}',
-            ),
-            const SizedBox(height: AppSize.s8),
-            _buildPriceRow(
-              'DeliveryFee',
-              '${double.parse(order.deliveryFee).toStringAsFixed(0)} ${'SP'.tr}',
-            ),
-            const SizedBox(height: AppSize.s8),
-            _buildPriceRow('Total', '$totalAmount ${'SP'.tr}', isTotal: true),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label.tr,
-          style: TextStyle(
-            fontSize: FontSize.s14,
-            color: ColorManager.colorDoveGray600,
-            fontWeight: isTotal ? FontWeight.w500 : FontWeight.normal,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: FontSize.s14,
-            color: isTotal
-                ? ColorManager.colorFontPrimary
-                : ColorManager.colorDoveGray600,
-            fontWeight: isTotal ? FontWeight.w700 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShimmerList() {
-    return Shimmer.fromColors(
-      baseColor: ColorManager.colorGrey2.withOpacity(0.3),
-      highlightColor: ColorManager.colorGrey2.withOpacity(0.1),
-      child: ListView.builder(
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: AppSize.s8),
-            padding: const EdgeInsets.all(AppPadding.p20),
-            decoration: BoxDecoration(color: Colors.white),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(width: 120, height: 18, color: Colors.white),
-                        const SizedBox(height: AppSize.s6),
-                        Container(width: 80, height: 14, color: Colors.white),
-                      ],
-                    ),
-                    Container(width: 70, height: 28, color: Colors.white),
-                  ],
-                ),
-                const SizedBox(height: AppSize.s16),
-                Row(
-                  children: [
-                    Container(width: 16, height: 16, color: Colors.white),
-                    const SizedBox(width: AppSize.s8),
-                    Container(width: 200, height: 14, color: Colors.white),
-                  ],
-                ),
-                const SizedBox(height: AppSize.s16),
-                Container(height: 1, color: Colors.white),
-                const SizedBox(height: AppSize.s16),
-                Container(
-                  width: double.infinity,
-                  height: 14,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: AppSize.s8),
-                Container(
-                  width: double.infinity,
-                  height: 14,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: AppSize.s8),
-                Container(
-                  width: double.infinity,
-                  height: 16,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: AppSize.s16),
-                Container(
-                  width: double.infinity,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSize.s12),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
 }
 
 Widget buildStatusBadge(String status) {
-  // خريطة لكل حالة: اللون، الأيقونة
   final Map<String, Map<String, dynamic>> statusMap = {
     'pending': {'color': ColorManager.colorPrimary, 'icon': Icons.access_time},
     'accepted': {'color': Colors.blue, 'icon': Icons.thumb_up_outlined},
@@ -324,7 +280,6 @@ Widget buildStatusBadge(String status) {
     'cancelled': {'color': Colors.red, 'icon': Icons.cancel_outlined},
   };
 
-  // إذا الحالة غير موجودة، نستخدم default
   final statusData =
       statusMap[status] ?? {'color': Colors.grey, 'icon': Icons.info_outline};
 
@@ -337,9 +292,9 @@ Widget buildStatusBadge(String status) {
       vertical: AppPadding.p8,
     ),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(AppSize.s20),
-      border: Border.all(color: color.withOpacity(0.3), width: 1),
+      border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,

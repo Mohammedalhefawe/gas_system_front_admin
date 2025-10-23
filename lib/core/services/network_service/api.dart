@@ -2,7 +2,7 @@ abstract class Api {
   static const String imageBaseUrl = "http://10.0.2.2:8000/storage/";
 
   /// Authentication
-  static const String register = "auth/register/customer";
+  static const String register = "auth/register/driver";
   static const String login = "auth/login";
   static const String logout = "auth/logout";
   static const String verify = "auth/customer/verify";
@@ -17,11 +17,11 @@ abstract class Api {
   /// Ads
   static const String ads = "ads";
 
-  /// Addresses
-  static const String addresses = "addresses";
+  /// drivers
+  static const String drivers = "drivers";
 
-  ///Product Reviews
-  static const String productReviews = "product-reviews";
+  ///Categories
+  static const String categories = "categories";
 
   ///Orders
   static const String orders = "customer/orders";

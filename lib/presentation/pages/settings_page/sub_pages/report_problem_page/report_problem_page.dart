@@ -117,7 +117,7 @@
 //                                             padding: const EdgeInsets.all(4),
 //                                             decoration: BoxDecoration(
 //                                               color: ColorManager.colorRed
-//                                                   .withOpacity(0.8),
+//                                                   .withValues(alpha: 0.8),
 //                                               shape: BoxShape.circle,
 //                                             ),
 //                                             child: Icon(
@@ -145,7 +145,7 @@
 //                                           style: BorderStyle.solid,
 //                                         ),
 //                                         color: ColorManager.colorGrey1
-//                                             .withOpacity(0.1),
+//                                             .withValues(alpha: 0.1),
 //                                       ),
 //                                       child: Column(
 //                                         mainAxisAlignment:

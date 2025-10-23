@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:gas_admin_app/core/app_config/app_translation.dart';
+import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
+import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
+import 'package:gas_admin_app/presentation/util/resources/phone_number_formater.dart';
+import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
+
+class PhoneNumberInput extends StatelessWidget {
+  const PhoneNumberInput({
+    super.key,
+    required this.textEditingController,
+    required this.onChanged,
+    this.focusNode,
+    this.validator,
+    this.hintText = '',
+    this.title,
+    this.readOnly = false,
+    this.minHeight = 50,
+    this.borderRadius = 16,
+    this.autoValidateMode = AutovalidateMode.disabled,
+    this.requiredField = true,
+  });
+
+  final TextEditingController textEditingController;
+  final void Function(String) onChanged;
+  final FocusNode? focusNode;
+  final String? Function(String?)? validator;
+  final String hintText;
+  final String? title;
+  final bool readOnly;
+  final double minHeight;
+  final double borderRadius;
+  final AutovalidateMode autoValidateMode;
+  final bool requiredField;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title != null
+            ? RichText(
+                text: TextSpan(
+                  text: title!,
+                  style: Get.textTheme.titleMedium,
+                  children: requiredField
+                      ? [
+                          TextSpan(
+                            text: ' *',
+                            style: Get.textTheme.titleMedium?.copyWith(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ]
+                      : [],
+                ),
+              )
+            : const SizedBox.shrink(),
+        title != null ? const SizedBox(height: 8) : const SizedBox.shrink(),
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Container(
+            constraints: BoxConstraints(minHeight: minHeight),
+            child: TextFormField(
+              controller: textEditingController,
+              focusNode: focusNode,
+              readOnly: readOnly,
+              validator: validator,
+              onChanged: onChanged,
+              autovalidateMode: autoValidateMode,
+              maxLength: 11,
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.next,
+              inputFormatters: [PhoneNumberFormatter(onChanged: onChanged)],
+              textAlign: AppTranslations.isArabic
+                  ? TextAlign.end
+                  : TextAlign.start,
+              style: TextStyle(
+                fontSize: FontSize.s14,
+                fontWeight: FontWeight.w500,
+                color: ColorManager.colorFontPrimary,
+              ),
+              decoration: InputDecoration(
+                counterText: '',
+                hintText: hintText,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppPadding.p16,
+                  vertical: AppPadding.p12,
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 0,
+                  minHeight: 0,
+                ),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Assets.icons.flagSyriaIcon.svg(width: AppSize.s28),
+                      const SizedBox(width: 8),
+                      Text(
+                        '+963',
+                        style: TextStyle(
+                          fontSize: FontSize.s14,
+                          fontWeight: FontWeight.w500,
+                          color: ColorManager.colorFontPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Assets.icons.mobileIcon.svg(width: AppSize.s24),
+                ),
+                filled: true,
+                fillColor: ColorManager.colorWhite,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: ColorManager.colorTextFieldEnabledBorder,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: ColorManager.colorTextFieldFocusedBorder,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: ColorManager.colorTextFieldErrorBorder,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: ColorManager.colorTextFieldErrorBorder,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

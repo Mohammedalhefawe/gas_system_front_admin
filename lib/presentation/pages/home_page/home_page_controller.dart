@@ -1,66 +1,52 @@
-import 'package:gas_admin_app/presentation/pages/cart_page/cart_page_controller.dart';
+import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
+import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:get/get.dart';
-import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
-import 'package:gas_admin_app/data/models/ad_model.dart';
-import 'package:gas_admin_app/data/models/product_model.dart';
-import 'package:gas_admin_app/data/repos/home_repo.dart';
-import 'package:gas_admin_app/presentation/custom_widgets/custom_toasts.dart';
 
 class HomePageController extends GetxController {
-  final HomeRepo homeRepo = Get.find<HomeRepo>();
-  final CartController cartController = Get.find<CartController>();
+  List<ManageHomeModel> homeManagementList = [
+    ManageHomeModel(
+      name: "ManageProducts".tr,
+      icon: Assets.icons.fuelIcon,
+      onTap: () {
+        Get.toNamed(AppRoutes.productsRoute);
+      },
+    ),
+    ManageHomeModel(
+      name: "ManageAds".tr,
+      icon: Assets.icons.adsIcon,
+      onTap: () {
+        Get.toNamed(AppRoutes.adsRoute);
+      },
+    ),
+    ManageHomeModel(
+      name: "ManageCategories".tr,
+      icon: Assets.icons.shopIcon,
+      onTap: () {
+        Get.toNamed(AppRoutes.categoriesRoute);
+      },
+    ),
+    ManageHomeModel(
+      name: "ManageDrivers".tr,
+      icon: Assets.icons.motorIcon,
+      onTap: () {
+        Get.toNamed(AppRoutes.driversRoute);
+      },
+    ),
+    ManageHomeModel(
+      name: "ManageUsers".tr,
+      icon: Assets.icons.userIcon,
+      onTap: () {},
+    ),
+  ];
+}
 
-  final products = <ProductModel>[].obs;
-  final ads = <AdModel>[].obs;
-  final productsLoadingState = LoadingState.idle.obs;
-  final adsLoadingState = LoadingState.idle.obs;
-  final reviewLoadingState = LoadingState.idle.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchProducts();
-    fetchAds();
-  }
-
-  Future<void> fetchProducts() async {
-    productsLoadingState.value = LoadingState.loading;
-
-    final response = await homeRepo.getProducts();
-
-    if (!response.success) {
-      productsLoadingState.value = LoadingState.hasError;
-      CustomToasts(
-        message: response.getErrorMessage(),
-        type: CustomToastType.error,
-      ).show();
-      return;
-    }
-
-    products.value = response.data ?? [];
-    for (int i = 0; i < products.length; i++) {
-      products[i] = products[i].copyWith(
-        isExistInCart: cartController.isProductInCart(products[i].id),
-      );
-    }
-    productsLoadingState.value = LoadingState.doneWithData;
-  }
-
-  Future<void> fetchAds() async {
-    adsLoadingState.value = LoadingState.loading;
-
-    final response = await homeRepo.getAds();
-
-    if (!response.success) {
-      adsLoadingState.value = LoadingState.hasError;
-      CustomToasts(
-        message: response.getErrorMessage(),
-        type: CustomToastType.error,
-      ).show();
-      return;
-    }
-
-    ads.value = response.data ?? [];
-    adsLoadingState.value = LoadingState.doneWithData;
-  }
+class ManageHomeModel {
+  final String name;
+  final SvgGenImage icon;
+  final void Function()? onTap;
+  ManageHomeModel({
+    required this.name,
+    required this.icon,
+    required this.onTap,
+  });
 }

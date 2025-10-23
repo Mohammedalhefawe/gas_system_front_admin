@@ -63,10 +63,10 @@ class RegistrationPageController extends GetxController {
       type: CustomToastType.success,
     ).show();
 
-    Get.toNamed(
-      AppRoutes.verificationRoute,
-      arguments: {'phoneNumber': fullNumber},
-    );
+    // Get.toNamed(
+    //   AppRoutes.verificationRoute,
+    //   arguments: {'phoneNumber': fullNumber},
+    // );
 
     registerLoadingState.value = LoadingState.doneWithData;
   }

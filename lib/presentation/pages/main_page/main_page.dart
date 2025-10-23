@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gas_admin_app/presentation/pages/account_page/account_page.dart';
-import 'package:gas_admin_app/presentation/pages/auth/login_page/login_page.dart';
-import 'package:gas_admin_app/presentation/pages/cart_page/cart_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/home_page/home_page.dart';
-import 'package:gas_admin_app/presentation/pages/orders_page/orders_page.dart';
 import 'package:get/get.dart';
 import 'package:gas_admin_app/presentation/pages/main_page/main_page_controller.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
-import 'package:badges/badges.dart' as badges;
+// import 'package:badges/badges.dart' as badges;
 
 class MainPage extends GetView<MainController> {
   const MainPage({super.key});
@@ -28,7 +25,7 @@ class MainPage extends GetView<MainController> {
             controller.pageIndex.value = pageIndex;
           },
           controller: controller.pageController,
-          children: const [HomePage(), OrdersPage(), AccountPage()],
+          children: const [HomePage(), AccountPage()],
         ),
         bottomNavigationBar: MainPageNavBar(),
         // floatingActionButton: MainPageButton(),
@@ -44,8 +41,6 @@ class MainPageAppBar extends GetView<MainController>
 
   @override
   Widget build(BuildContext context) {
-    final cartController = Get.find<CartController>();
-
     return Obx(() {
       int pageIndex = controller.pageIndex.value;
       if (pageIndex == homeTabIndex) {
@@ -61,30 +56,12 @@ class MainPageAppBar extends GetView<MainController>
             ],
           ),
           actions: [
-            SizedBox(width: AppSize.sWidth * 0.04),
-            InkWell(
-              onTap: () async {
-                Get.toNamed(AppRoutes.cartRoute);
-              },
-              child: badges.Badge(
-                showBadge: cartController.cartItems.isNotEmpty,
-                position: badges.BadgePosition.topStart(),
-                badgeContent: Text(
-                  cartController.cartItems.length.toString(),
-                  style: Get.textTheme.labelSmall!.copyWith(
-                    color: ColorManager.colorWhite,
-                  ),
-                ),
-                child: Assets.icons.cartIcon.svg(width: AppSize.sWidth * 0.07),
-              ),
-            ),
             SizedBox(width: AppSize.sWidth * 0.06),
             InkWell(
               onTap: () async {
                 // if (await controller.usersRepo.checkLoggedInAndShowDialog()) {
                 //   Get.toNamed(AppRoutes.notificationsRoute);
                 // }
-                Get.toNamed(AppRoutes.addressRoute);
               },
               child: Assets.icons.notificationIcon.svg(
                 width: AppSize.sWidth * 0.065,
@@ -94,42 +71,7 @@ class MainPageAppBar extends GetView<MainController>
           ],
         );
       }
-      if (pageIndex == ordersTabIndex) {
-        return AppBar(
-          backgroundColor: ColorManager.colorBackground,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Text('orders'.tr, style: Get.textTheme.titleLarge),
 
-          actions: [
-            SizedBox(width: AppSize.sWidth * 0.04),
-            InkWell(
-              onTap: () async {
-                Get.toNamed(AppRoutes.cartRoute);
-              },
-              child: badges.Badge(
-                showBadge: cartController.cartItems.isNotEmpty,
-                position: badges.BadgePosition.topStart(),
-                badgeContent: Text(
-                  cartController.cartItems.length.toString(),
-                  style: Get.textTheme.labelSmall!.copyWith(
-                    color: ColorManager.colorWhite,
-                  ),
-                ),
-                child: Assets.icons.cartIcon.svg(width: AppSize.sWidth * 0.07),
-              ),
-            ),
-            SizedBox(width: AppSize.sWidth * 0.06),
-            InkWell(
-              onTap: () async {},
-              child: Assets.icons.notificationIcon.svg(
-                width: AppSize.sWidth * 0.065,
-              ),
-            ),
-            SizedBox(width: AppSize.sWidth * 0.06),
-          ],
-        );
-      }
       if (pageIndex == accountTabIndex) {
         return AppBar(
           backgroundColor: ColorManager.colorBackground,
@@ -209,7 +151,6 @@ class MainPageNavBar extends GetView<MainController> {
                   items:
                       [
                         NavBarItem('home'.tr, Assets.icons.homeIcon),
-                        NavBarItem('orders'.tr, Assets.icons.adsIcon),
                         NavBarItem('account'.tr, Assets.icons.userAccountIcon),
                       ].asMap().entries.map((item) {
                         return BottomNavigationBarItem(

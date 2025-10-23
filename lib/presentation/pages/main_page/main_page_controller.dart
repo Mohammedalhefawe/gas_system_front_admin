@@ -5,8 +5,7 @@ import 'package:gas_admin_app/core/services/cache_service.dart';
 import 'package:gas_admin_app/data/repos/users_repo.dart';
 
 const homeTabIndex = 0;
-const ordersTabIndex = 1;
-const accountTabIndex = 2;
+const accountTabIndex = 1;
 
 class MainController extends GetxController {
   final UsersRepo usersRepo = Get.find<UsersRepo>();

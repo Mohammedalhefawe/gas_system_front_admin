@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gas_admin_app/data/models/address_model.dart';
+import 'package:gas_admin_app/data/models/customer_model.dart';
 import 'package:gas_admin_app/data/models/product_model.dart';
 
 class OrderModel {
@@ -22,6 +23,7 @@ class OrderModel {
   final String? review;
   final List<OrderItemModel> items;
   final AddressModel address;
+  final CustomerModel? customer;
 
   OrderModel({
     required this.orderId,
@@ -42,6 +44,7 @@ class OrderModel {
     this.review,
     required this.items,
     required this.address,
+    this.customer,
   });
 
   Map<String, dynamic> toJson() => {
@@ -90,6 +93,9 @@ class OrderModel {
               ?.map((e) => OrderItemModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      customer: json['customer'] != null
+          ? CustomerModel.fromJson(json['customer'])
+          : null,
       address: AddressModel.fromJson(json['address'] ?? {}),
     );
   }

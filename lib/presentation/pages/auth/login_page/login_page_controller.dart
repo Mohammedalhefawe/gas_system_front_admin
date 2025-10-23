@@ -41,7 +41,7 @@ class LoginPageController extends GetxController {
     );
 
     if (!response.success ||
-        (response.success && response.data?.user.role != "customer")) {
+        (response.success && response.data?.user.role != "admin")) {
       loginLoadingState.value = LoadingState.hasError;
       CustomToasts(
         message: response.getErrorMessage(),

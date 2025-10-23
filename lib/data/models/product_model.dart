@@ -1,81 +1,74 @@
 import 'package:gas_admin_app/core/extensions/prefix_url_image_extension.dart';
 
 class ProductModel {
-  final int id;
-  final int categoryId;
+  final int productId;
   final String productName;
   final String description;
-  final String? imageUrl;
-  final double price;
   final bool isAvailable;
+  final String categoryId;
+  final double price;
+  final String? imageUrl;
   final String? specialNotes;
-  final String createdAt;
-  final bool isExistInCart;
+  final String? createdAt;
 
   ProductModel({
-    required this.id,
-    required this.categoryId,
+    required this.productId,
     required this.productName,
     required this.description,
-    this.imageUrl,
-    required this.price,
     required this.isAvailable,
+    required this.categoryId,
+    required this.price,
+    this.imageUrl,
     this.specialNotes,
-    required this.createdAt,
-    this.isExistInCart = false,
+    this.createdAt,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['product_id'] as int,
-      categoryId: json['category_id'] as int,
-      productName: json['product_name'] as String,
-      description: json['description'] as String,
+      productId: json['product_id'] ?? 0,
+      productName: json['product_name'] ?? '',
+      description: json['description'] ?? '',
+      isAvailable: json['is_available'] == 1 || json['is_available'] == true,
+      categoryId: json['category_id']?.toString() ?? "0",
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       imageUrl: (json['image_url'] as String?)?.withImagePrefix,
-      price: double.parse(json['price'] as String),
-      isAvailable: (json['is_available'] as int) == 1,
-      specialNotes: json['special_notes'] as String?,
-      createdAt: json['created_at'] as String,
+      specialNotes: json['special_notes'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'product_id': id,
-      'category_id': categoryId,
+      'product_id': productId,
       'product_name': productName,
       'description': description,
-      'image_url': imageUrl,
-      'price': price.toString(),
-      'is_available': isAvailable ? 1 : 0,
-      'special_notes': specialNotes,
-      'created_at': createdAt,
+      'is_available': isAvailable ? "1" : "0",
+      'category_id': categoryId,
+      'price': price.toStringAsFixed(0),
+      if (specialNotes != null) 'special_notes': specialNotes,
     };
   }
 
   ProductModel copyWith({
-    int? id,
-    int? categoryId,
+    int? productId,
     String? productName,
     String? description,
-    String? imageUrl,
-    double? price,
     bool? isAvailable,
+    String? categoryId,
+    double? price,
+    String? imageUrl,
     String? specialNotes,
     String? createdAt,
-    bool? isExistInCart,
   }) {
     return ProductModel(
-      id: id ?? this.id,
-      categoryId: categoryId ?? this.categoryId,
+      productId: productId ?? this.productId,
       productName: productName ?? this.productName,
       description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
-      price: price ?? this.price,
       isAvailable: isAvailable ?? this.isAvailable,
+      categoryId: categoryId ?? this.categoryId,
+      price: price ?? this.price,
+      imageUrl: imageUrl ?? this.imageUrl,
       specialNotes: specialNotes ?? this.specialNotes,
       createdAt: createdAt ?? this.createdAt,
-      isExistInCart: isExistInCart ?? this.isExistInCart,
     );
   }
 }

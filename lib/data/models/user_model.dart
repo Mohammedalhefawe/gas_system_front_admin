@@ -21,10 +21,16 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      fullName: json['role_info']?['full_name'] as String,
+      fullName: "Admin",
       userId: json['user_id'] as int,
       phoneNumber: json['phone_number'] as String,
-      role: json['role'] as String,
+      role: (json['role'] != null)
+          ? json['role'] as String
+          : json['role_id']?.toString() == "1"
+          ? "admin"
+          : json['role_id']?.toString() == "2"
+          ? "customer"
+          : "driver",
       isVerified: json['is_verified'] as bool,
       createdAt: json['created_at'] as String?,
       roleInfo: json['role_info'],

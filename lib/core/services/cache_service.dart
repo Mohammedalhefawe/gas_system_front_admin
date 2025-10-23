@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gas_admin_app/data/models/user_model.dart';
-import 'package:gas_admin_app/data/models/cart_item_model.dart';
 
 const kUserLoginModelKey = "kUserLoginModelKey";
 const kUserTokenKey = "kUserTokenKey";
@@ -94,57 +93,10 @@ class CacheService extends GetxService {
   }
 
   // Cart Management
-  Future<void> saveCartItems(List<CartItemModel> cartItems) async {
-    await _getStorage.write(
-      kCartItemsKey,
-      cartItems.map((item) => item.toRawJson()).toList(),
-    );
-  }
 
-  List<CartItemModel> getCartItems() {
-    final List<dynamic>? items = _getStorage.read(kCartItemsKey);
-    if (items == null) return [];
-    print("items: $items");
-    return items.map((item) => CartItemModel.fromRawJson(item)).toList();
-  }
 
-  Future<void> addToCart(CartItemModel cartItem) async {
-    final cartItems = getCartItems();
-    final existingItemIndex = cartItems.indexWhere(
-      (item) => item.product.id == cartItem.product.id,
-    );
-    if (existingItemIndex >= 0) {
-      cartItems[existingItemIndex] = CartItemModel(
-        product: cartItems[existingItemIndex].product,
-        quantity: cartItems[existingItemIndex].quantity + cartItem.quantity,
-      );
-    } else {
-      cartItems.add(cartItem);
-    }
-    await saveCartItems(cartItems);
-  }
 
-  Future<void> removeFromCart(int productId) async {
-    final cartItems = getCartItems();
-    cartItems.removeWhere((item) => item.product.id == productId);
-    await saveCartItems(cartItems);
-  }
 
-  Future<void> updateCartItemQuantity(int productId, int quantity) async {
-    final cartItems = getCartItems();
-    final index = cartItems.indexWhere((item) => item.product.id == productId);
-    if (index >= 0 && quantity > 0) {
-      cartItems[index] = CartItemModel(
-        product: cartItems[index].product,
-        quantity: quantity,
-      );
-      await saveCartItems(cartItems);
-    } else if (index >= 0 && quantity <= 0) {
-      await removeFromCart(productId);
-    }
-  }
 
-  Future<void> clearCart() async {
-    await _getStorage.remove(kCartItemsKey);
-  }
+
 }

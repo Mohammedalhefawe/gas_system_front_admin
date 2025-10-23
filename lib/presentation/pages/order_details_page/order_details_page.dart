@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:gas_admin_app/core/extensions/phone_call_extension.dart';
 import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
-import 'package:gas_admin_app/presentation/custom_widgets/app_button.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
 import 'package:gas_admin_app/presentation/pages/order_details_page/order_details_controller.dart';
 import 'package:gas_admin_app/presentation/pages/orders_page/orders_page.dart';
 import 'package:gas_admin_app/presentation/util/date_converter.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
-import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
-class OrderDetailsPage extends GetView<OrderDetailsController> {
-  const OrderDetailsPage({super.key});
+class DriverOrderDetailsPage extends GetView<OrderDetailsController> {
+  const DriverOrderDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +47,7 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
               width: AppSize.s100,
               height: AppSize.s100,
               decoration: BoxDecoration(
-                color: ColorManager.colorPrimary.withOpacity(0.1),
+                color: ColorManager.colorPrimary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -141,52 +140,6 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
                         buildStatusBadge(order.orderStatus),
                       ],
                     ),
-                    if (order.orderStatus == 'pending' ||
-                        (order.orderStatus == 'completed' &&
-                            order.rating == null &&
-                            order.review == null))
-                      Column(
-                        children: [
-                          const SizedBox(height: AppSize.s20),
-
-                          // Actions Row
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AppButton(
-                                  onPressed: () {
-                                    if (order.orderStatus == 'pending') {
-                                      controller.showCancelConfirmation(
-                                        context,
-                                      );
-                                    } else if (order.orderStatus ==
-                                        'completed') {
-                                      Get.toNamed(
-                                        AppRoutes.addReviewOrderRoute,
-                                        arguments: order.orderId,
-                                      );
-                                    }
-                                  },
-                                  text: order.orderStatus == 'pending'
-                                      ? 'CancelOrder'.tr
-                                      : 'RateOrder'.tr,
-                                  backgroundColor: ColorManager.colorWhite,
-                                  border: Border.all(
-                                    width: 1,
-                                    color: order.orderStatus == 'pending'
-                                        ? ColorManager.colorSecondaryRed
-                                        : ColorManager.colorPrimary,
-                                  ),
-
-                                  fontColor: order.orderStatus == 'pending'
-                                      ? ColorManager.colorSecondaryRed
-                                      : ColorManager.colorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
                   ],
                 ),
               ],
@@ -199,6 +152,21 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
           _buildInfoCard(
             title: 'OrderInformation'.tr,
             children: [
+              _buildInfoRow(
+                Assets.icons.userIcon,
+                'FullName'.tr,
+                order.customer?.fullName ?? "Unknown",
+              ),
+              InkWell(
+                onTap: () {
+                  order.customer?.user?.phoneNumber.makePhoneCall();
+                },
+                child: _buildInfoRow(
+                  Assets.icons.callIcon,
+                  'numberPhone'.tr,
+                  order.customer?.user?.phoneNumber ?? "Unknown",
+                ),
+              ),
               _buildInfoRow(
                 Assets.icons.motorIcon,
                 'DeliveryType'.tr,
@@ -218,12 +186,6 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
                   'DeliveryTime'.tr,
                   DateConverter.formatTimeOnly(order.deliveryTime!),
                 ),
-              _buildInfoRow(
-                Assets.icons.locationIcon,
-                'Address'.tr,
-                order.address.addressName ?? order.address.address,
-                maxLines: 3,
-              ),
 
               _buildInfoRow(
                 Assets.icons.paymentIcon,
@@ -285,16 +247,19 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
           _buildInfoCard(
             title: 'OrderSummary'.tr,
             children: [
-              _buildSummaryRow('Subtotal', '${order.totalAmount} ${'SP'.tr}'),
+              _buildSummaryRow(
+                'Subtotal',
+                '${double.parse(order.totalAmount).toStringAsFixed(0)} ${'SP'.tr}',
+              ),
               const SizedBox(height: AppSize.s8),
               _buildSummaryRow(
                 'DeliveryFee',
-                '${order.deliveryFee} ${'SP'.tr}',
+                '${double.parse(order.deliveryFee).toStringAsFixed(0)} ${'SP'.tr}',
               ),
               const SizedBox(height: AppSize.s12),
               Container(
                 height: 1,
-                color: ColorManager.colorGrey2.withOpacity(0.15),
+                color: ColorManager.colorGrey2.withValues(alpha: 0.15),
               ),
               const SizedBox(height: AppSize.s12),
               _buildSummaryRow(
@@ -376,6 +341,7 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
                 const SizedBox(height: AppSize.s4),
                 Text(
                   value,
+                  textDirection: TextDirection.ltr,
                   style: TextStyle(
                     fontSize: FontSize.s14,
                     color: ColorManager.colorFontPrimary,
@@ -427,7 +393,9 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
       decoration: BoxDecoration(
         color: ColorManager.colorGrey0,
         borderRadius: BorderRadius.circular(AppSize.s12),
-        border: Border.all(color: ColorManager.colorGrey2.withOpacity(0.3)),
+        border: Border.all(
+          color: ColorManager.colorGrey2.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -504,8 +472,8 @@ class OrderDetailsPage extends GetView<OrderDetailsController> {
 
   Widget _buildShimmerDetails() {
     return Shimmer.fromColors(
-      baseColor: ColorManager.colorGrey2.withOpacity(0.3),
-      highlightColor: ColorManager.colorGrey2.withOpacity(0.1),
+      baseColor: ColorManager.colorGrey2.withValues(alpha: 0.3),
+      highlightColor: ColorManager.colorGrey2.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(AppPadding.p16),
         child: Column(

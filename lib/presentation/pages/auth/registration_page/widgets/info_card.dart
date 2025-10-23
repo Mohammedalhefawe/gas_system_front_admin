@@ -109,7 +109,7 @@ class InfoCard extends StatelessWidget {
 //                 Container(
 //                   padding: const EdgeInsets.all(AppPadding.p8),
 //                   decoration: BoxDecoration(
-//                     color: ColorManager.colorPrimary.withOpacity(0.1),
+//                     color: ColorManager.colorPrimary.withValues(alpha: 0.1),
 //                     borderRadius: BorderRadius.circular(12),
 //                   ),
 //                   child: Icon(
@@ -182,7 +182,7 @@ class InfoCard extends StatelessWidget {
 //         borderRadius: BorderRadius.circular(12),
 //         boxShadow: [
 //           BoxShadow(
-//             color: Colors.black12.withOpacity(0.05),
+//             color: Colors.black12.withValues(alpha: 0.05),
 //             offset: const Offset(0, 2),
 //             blurRadius: 4,
 //           ),
@@ -195,7 +195,7 @@ class InfoCard extends StatelessWidget {
 //           Container(
 //             padding: const EdgeInsets.all(AppPadding.p8),
 //             decoration: BoxDecoration(
-//               color: iconColors[index].withOpacity(0.1),
+//               color: iconColors[index].withValues(alpha: 0.1),
 //               shape: BoxShape.circle,
 //             ),
 //             child: Icon(icons[index], color: iconColors[index], size: 20),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:get/get.dart';
 import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/app_button.dart';
@@ -45,34 +44,6 @@ class LoginPage extends GetView<LoginPageController> {
                         text: 'login'.tr,
                       );
                     }),
-                    SizedBox(height: AppSize.s12),
-                    TextButton(
-                      onPressed: () {
-                        Get.toNamed(AppRoutes.forgotPasswordRoute);
-                      },
-                      child: Text(
-                        "forgotPassword".tr,
-                        style: TextStyle(
-                          color: ColorManager.colorPrimary,
-                          fontSize: FontSize.s13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: AppSize.s12),
-                    TextButton(
-                      onPressed: () {
-                        Get.toNamed(AppRoutes.registrationRoute);
-                      },
-                      child: Text(
-                        "register".tr,
-                        style: TextStyle(
-                          color: ColorManager.colorPrimary,
-                          fontSize: FontSize.s13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

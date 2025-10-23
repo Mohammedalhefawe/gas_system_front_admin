@@ -38,7 +38,7 @@ NetworkFailureModel _handleError(DioException error) {
           error.response?.statusCode ?? 0,
           error.response?.data is Map
               ? (error.response?.data["message"] ??
-                    error.response?.data["detail"] ??
+                    error.response?.data["data"] ??
                     "")
               : "",
         );

@@ -65,6 +65,9 @@ class $AssetsIconsGen {
   SvgGenImage get arrowBackIcon =>
       const SvgGenImage('assets/icons/arrow_back_icon.svg');
 
+  /// File path: assets/icons/block_icon.svg
+  SvgGenImage get blockIcon => const SvgGenImage('assets/icons/block_icon.svg');
+
   /// File path: assets/icons/building_icon.svg
   SvgGenImage get buildingIcon =>
       const SvgGenImage('assets/icons/building_icon.svg');
@@ -156,6 +159,12 @@ class $AssetsIconsGen {
   /// File path: assets/icons/folder_icon.svg
   SvgGenImage get folderIcon =>
       const SvgGenImage('assets/icons/folder_icon.svg');
+
+  /// File path: assets/icons/fuel_icon.svg
+  SvgGenImage get fuelIcon => const SvgGenImage('assets/icons/fuel_icon.svg');
+
+  /// File path: assets/icons/fuel_icon2.svg
+  SvgGenImage get fuelIcon2 => const SvgGenImage('assets/icons/fuel_icon2.svg');
 
   /// File path: assets/icons/gender_icon.svg
   SvgGenImage get genderIcon =>
@@ -318,6 +327,7 @@ class $AssetsIconsGen {
     advertisimentIcon,
     arrowPrevSmall,
     arrowBackIcon,
+    blockIcon,
     buildingIcon,
     callIcon,
     cameraAddIcon,
@@ -343,6 +353,8 @@ class $AssetsIconsGen {
     filterIcon,
     flagSyriaIcon,
     folderIcon,
+    fuelIcon,
+    fuelIcon2,
     genderIcon,
     helpIcon,
     homeIcon,
