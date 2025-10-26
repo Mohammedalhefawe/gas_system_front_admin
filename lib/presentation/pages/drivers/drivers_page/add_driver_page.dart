@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/app_button.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/custom_text_field.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
-import 'package:gas_admin_app/presentation/pages/drivers_page/drivers_page_controller.dart';
+import 'package:gas_admin_app/presentation/pages/drivers/drivers_page/drivers_page_controller.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';

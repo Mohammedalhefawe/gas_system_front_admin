@@ -4,8 +4,10 @@ import 'package:gas_admin_app/presentation/pages/auth/login_page/login_page.dart
 import 'package:gas_admin_app/presentation/pages/auth/login_page/login_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/categories_page/categories_page.dart';
 import 'package:gas_admin_app/presentation/pages/categories_page/categories_page_controller.dart';
-import 'package:gas_admin_app/presentation/pages/drivers_page/drivers_page.dart';
-import 'package:gas_admin_app/presentation/pages/drivers_page/drivers_page_controller.dart';
+import 'package:gas_admin_app/presentation/pages/customers/customers_page/customers_page.dart';
+import 'package:gas_admin_app/presentation/pages/customers/customers_page/customers_page_controller.dart';
+import 'package:gas_admin_app/presentation/pages/drivers/drivers_page/drivers_page.dart';
+import 'package:gas_admin_app/presentation/pages/drivers/drivers_page/drivers_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/main_page/main_page.dart';
 import 'package:gas_admin_app/presentation/pages/main_page/main_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/products_page/products_page.dart';
@@ -67,6 +69,11 @@ abstract class NavigationManager {
       page: () => DriversPage(),
       binding: BindingsBuilder.put(() => DriversPageController()),
     ),
+    GetPage(
+      name: AppRoutes.customersRoute,
+      page: () => CustomersPage(),
+      binding: BindingsBuilder.put(() => CustomersPageController()),
+    ),
   ];
 }
 
@@ -85,4 +92,6 @@ abstract class AppRoutes {
   static const String categoriesRoute = "/categoriesRoute";
 
   static const String driversRoute = "/driversRoute";
+
+  static const String customersRoute = "/customersRoute";
 }

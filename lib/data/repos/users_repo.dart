@@ -4,6 +4,7 @@ import 'package:gas_admin_app/data/dto/login_response_dto.dart';
 import 'package:gas_admin_app/data/dto/register_response_dto.dart';
 import 'package:gas_admin_app/data/models/app_response.dart';
 import 'package:gas_admin_app/data/models/user_model.dart';
+import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:get/get.dart';
 import 'package:gas_admin_app/core/services/cache_service.dart';
 import 'package:gas_admin_app/core/services/network_service/error_handler.dart';
@@ -17,11 +18,10 @@ class UsersRepo extends GetxService {
   var userLoggedIn = false.obs;
   var loggedInUser = Rx<UserModel>(UserModel.emptyUser());
 
-  // Future clearApp() async {
-  //   await cacheService.clearCache();
-  //   checkLoggedInAndShowDialog();
-  //   Get.offAllNamed(AppRoutes.mainRoute);
-  // }
+  Future clearApp() async {
+    await cacheService.clearCache();
+    Get.offAllNamed(AppRoutes.loginRoute);
+  }
 
   // void checkUserLoggedInState() {
   //   userLoggedIn.value = cacheService.isLoggedIn();

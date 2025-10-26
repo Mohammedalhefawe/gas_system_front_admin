@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gas_admin_app/data/repos/users_repo.dart';
 import 'package:get/get.dart' as getx;
 import 'package:gas_admin_app/core/services/cache_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -73,7 +74,7 @@ class ApiService extends getx.GetxService {
           debugPrint(
             'ERROR[${err.response?.statusCode}] => ${err.response?.data}',
           );
-          // await (getx.Get.find<UsersRepo>().clearApp());
+          await (getx.Get.find<UsersRepo>().clearApp());
         }
         return handler.next(err);
       },
@@ -97,7 +98,6 @@ class ApiService extends getx.GetxService {
 
     if (requiredToken) {
       String? token = await cacheService.getUserToken();
-      print("token: $token");
       headers = {
         'Content-Type': 'application/json',
         "Authorization": "Bearer $token",

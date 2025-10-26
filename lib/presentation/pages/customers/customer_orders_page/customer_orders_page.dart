@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
+import 'package:gas_admin_app/presentation/pages/customers/customer_orders_page/customer_orders_controller.dart';
+import 'package:gas_admin_app/presentation/pages/drivers/driver_orders_page/driver_orders_page.dart';
 import 'package:gas_admin_app/presentation/pages/order_details_page/order_details_page.dart';
-import 'package:gas_admin_app/presentation/pages/orders_page/orders_controller.dart';
 import 'package:gas_admin_app/presentation/util/date_converter.dart'
     show DateConverter;
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
@@ -11,23 +12,25 @@ import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
-class DriverOrdersPage extends StatefulWidget {
-  final int? driverId; // Optional driverId for specific driver orders
+class CustomerOrdersPage extends StatefulWidget {
+  final int? customerId;
 
-  const DriverOrdersPage({super.key, this.driverId});
+  const CustomerOrdersPage({super.key, this.customerId});
 
   @override
-  State<DriverOrdersPage> createState() => _DriverOrdersPageState();
+  State<CustomerOrdersPage> createState() => _CustomerOrdersPageState();
 }
 
-class _DriverOrdersPageState extends State<DriverOrdersPage>
+class _CustomerOrdersPageState extends State<CustomerOrdersPage>
     with SingleTickerProviderStateMixin {
-  late DriverOrdersController controller;
+  late CustomerOrdersController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = Get.put(DriverOrdersController(driverId: widget.driverId));
+    controller = Get.put(
+      CustomerOrdersController(customerId: widget.customerId),
+    );
   }
 
   @override
@@ -36,7 +39,7 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
       top: false,
       child: Scaffold(
         backgroundColor: ColorManager.colorGrey0,
-        appBar: NormalAppBar(title: 'DriverOrders'.tr, backIcon: true),
+        appBar: NormalAppBar(title: 'CustomerOrders'.tr, backIcon: true),
         body: _buildOrdersView(
           context,
           controller.myOrders,
@@ -62,7 +65,7 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
         return _buildEmptyState();
       }
       return RefreshIndicator(
-        onRefresh: controller.fetchDriverOrders,
+        onRefresh: controller.fetchCustomerOrders,
         color: ColorManager.colorPrimary,
         backgroundColor: ColorManager.colorWhite,
         child: ListView.separated(
@@ -189,7 +192,7 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
           ),
           const SizedBox(height: AppSize.s12),
           GestureDetector(
-            onTap: controller.fetchDriverOrders,
+            onTap: controller.fetchCustomerOrders,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -268,48 +271,4 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
       ),
     );
   }
-}
-
-Widget buildStatusBadge(String status) {
-  final Map<String, Map<String, dynamic>> statusMap = {
-    'pending': {'color': ColorManager.colorPrimary, 'icon': Icons.access_time},
-    'accepted': {'color': Colors.blue, 'icon': Icons.thumb_up_outlined},
-    'rejected': {'color': Colors.red, 'icon': Icons.block},
-    'on_the_way': {'color': Colors.orange, 'icon': Icons.delivery_dining},
-    'completed': {'color': Colors.green, 'icon': Icons.check_circle_outline},
-    'cancelled': {'color': Colors.red, 'icon': Icons.cancel_outlined},
-  };
-
-  final statusData =
-      statusMap[status] ?? {'color': Colors.grey, 'icon': Icons.info_outline};
-
-  final Color color = statusData['color'];
-  final IconData icon = statusData['icon'];
-
-  return Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppPadding.p12,
-      vertical: AppPadding.p8,
-    ),
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(AppSize.s20),
-      border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: AppSize.s14, color: color),
-        const SizedBox(width: AppSize.s4),
-        Text(
-          status.tr,
-          style: TextStyle(
-            fontSize: FontSize.s12,
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
-        ),
-      ],
-    ),
-  );
 }

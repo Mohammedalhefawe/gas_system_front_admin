@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gas_admin_app/data/models/product_model.dart';
 import 'package:gas_admin_app/presentation/pages/products_page/products_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/products_page/add_edit_product_page.dart';
+import 'package:gas_admin_app/presentation/pages/products_page/products_reviews_page.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
@@ -136,8 +137,24 @@ class ProductTile extends GetView<ProductsPageController> {
                   ),
                 ),
                 backgroundColor: ColorManager.colorError.withValues(alpha: 0.1),
-                onPressed: () => controller.deleteProduct(data.productId),
+                onPressed: () =>
+                    controller.deleteProduct(data.productId.toString()),
                 label: 'Delete'.tr,
+              ),
+              const SizedBox(width: AppSize.s8),
+              buildActionButton(
+                icon: Assets.icons.detailsIcon.svg(
+                  width: 18,
+                  colorFilter: ColorFilter.mode(
+                    Colors.yellow[700]!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                backgroundColor: Colors.yellow[700]!.withValues(alpha: 0.1),
+                onPressed: () => Get.to(
+                  ProductReviewsPage(productId: data.productId.toString()),
+                ),
+                label: 'ViewReviews'.tr,
               ),
             ],
           ),

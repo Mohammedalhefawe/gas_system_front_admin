@@ -4,7 +4,7 @@ import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
 import 'package:gas_admin_app/presentation/pages/order_details_page/order_details_controller.dart';
-import 'package:gas_admin_app/presentation/pages/orders_page/orders_page.dart';
+import 'package:gas_admin_app/presentation/pages/drivers/driver_orders_page/driver_orders_page.dart';
 import 'package:gas_admin_app/presentation/util/date_converter.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';

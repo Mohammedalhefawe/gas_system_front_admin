@@ -231,6 +231,7 @@ class AccountPage extends GetView<AccountController> {
               SizedBox(height: AppSize.s4),
               Text(
                 value,
+                textDirection: TextDirection.ltr,
                 style: TextStyle(
                   fontSize: FontSize.s14,
                   color: ColorManager.colorFontPrimary,

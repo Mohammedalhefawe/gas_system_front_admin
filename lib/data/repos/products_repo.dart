@@ -6,6 +6,7 @@ import 'package:gas_admin_app/core/services/network_service/remote_api_service.d
 import 'package:gas_admin_app/data/models/app_response.dart';
 import 'package:gas_admin_app/data/models/product_model.dart';
 import 'package:gas_admin_app/data/models/category_model.dart';
+import 'package:gas_admin_app/data/models/review_model.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 
@@ -67,7 +68,7 @@ class ProductsRepo extends GetxService {
   }
 
   Future<AppResponse<ProductModel>> updateProduct(
-    int productId,
+    String productId,
     ProductModel product,
     File? imageFile,
   ) async {
@@ -99,7 +100,7 @@ class ProductsRepo extends GetxService {
     return appResponse;
   }
 
-  Future<AppResponse<void>> deleteProduct(int productId) async {
+  Future<AppResponse<void>> deleteProduct(String productId) async {
     AppResponse<void> appResponse = AppResponse(success: false);
 
     try {
@@ -206,6 +207,30 @@ class ProductsRepo extends GetxService {
       appResponse.success = true;
       appResponse.successMessage =
           response.data['message'] ?? 'Category deleted successfully';
+    } catch (e) {
+      appResponse.success = false;
+      appResponse.networkFailure = ErrorHandler.handle(e).failure;
+    }
+    return appResponse;
+  }
+
+  Future<AppResponse<List<ReviewModel>>> getProductReviews(
+    String productId,
+  ) async {
+    AppResponse<List<ReviewModel>> appResponse = AppResponse(success: false);
+
+    try {
+      final response = await apiService.request(
+        url: '${Api.products}/$productId/reviews',
+        method: Method.get,
+        requiredToken: true,
+        withLogging: true,
+      );
+      appResponse.success = true;
+      appResponse.data = (response.data?['data']?['reviews'] as List<dynamic>?)
+          ?.map((e) => ReviewModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      appResponse.successMessage = response.data['message'];
     } catch (e) {
       appResponse.success = false;
       appResponse.networkFailure = ErrorHandler.handle(e).failure;

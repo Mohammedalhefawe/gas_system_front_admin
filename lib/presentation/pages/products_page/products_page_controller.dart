@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/product_model.dart';
 import 'package:gas_admin_app/data/models/category_model.dart';
+import 'package:gas_admin_app/data/models/review_model.dart';
 import 'package:gas_admin_app/data/repos/products_repo.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/custom_toasts.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,9 @@ class ProductsPageController extends GetxController {
   final ProductsRepo productsRepo = Get.find<ProductsRepo>();
   final products = <ProductModel>[].obs;
   final categories = <CategoryModel>[].obs;
+  final reviews = <ReviewModel>[].obs;
   final loadingState = LoadingState.idle.obs;
+  final reviewsLoadingState = LoadingState.idle.obs;
 
   // Form controllers
   final TextEditingController productNameController = TextEditingController();
@@ -63,17 +66,21 @@ class ProductsPageController extends GetxController {
   Future<void> addProduct() async {
     if (!_validateForm()) return;
     loadingState.value = LoadingState.loading;
+
     final product = ProductModel(
       productId: 0,
+      categoryId: selectedCategoryId.value,
       productName: productNameController.text.trim(),
       description: descriptionController.text.trim(),
-      isAvailable: isAvailable.value,
-      categoryId: selectedCategoryId.value,
       price: double.parse(priceController.text.trim()),
+      isAvailable: isAvailable.value,
       specialNotes: specialNotesController.text.trim().isEmpty
           ? null
           : specialNotesController.text.trim(),
+      imageUrl: '',
+      createdAt: '',
     );
+
     final response = await productsRepo.addProduct(
       product,
       selectedImage.value,
@@ -96,22 +103,24 @@ class ProductsPageController extends GetxController {
     ).show();
   }
 
-  Future<void> updateProduct(int productId) async {
+  Future<void> updateProduct(String productId) async {
     if (!_validateForm()) return;
     loadingState.value = LoadingState.loading;
+
     final product = ProductModel(
-      productId: productId,
+      productId: int.parse(productId),
+      categoryId: selectedCategoryId.value,
       productName: productNameController.text.trim(),
       description: descriptionController.text.trim(),
-      isAvailable: isAvailable.value,
-      categoryId: selectedCategoryId.value,
       price: double.parse(priceController.text.trim()),
-      imageUrl: null,
+      isAvailable: isAvailable.value,
       specialNotes: specialNotesController.text.trim().isEmpty
           ? null
           : specialNotesController.text.trim(),
-      createdAt: DateTime.now().toIso8601String(),
+      imageUrl: '',
+      createdAt: '',
     );
+
     final response = await productsRepo.updateProduct(
       productId,
       product,
@@ -138,7 +147,7 @@ class ProductsPageController extends GetxController {
     ).show();
   }
 
-  Future<void> deleteProduct(int productId) async {
+  Future<void> deleteProduct(String productId) async {
     loadingState.value = LoadingState.loading;
     final response = await productsRepo.deleteProduct(productId);
     if (!response.success) {
@@ -157,6 +166,23 @@ class ProductsPageController extends GetxController {
       message: response.successMessage ?? 'ProductDeleted'.tr,
       type: CustomToastType.success,
     ).show();
+  }
+
+  Future<void> fetchProductReviews(String productId) async {
+    reviewsLoadingState.value = LoadingState.loading;
+    final response = await productsRepo.getProductReviews(productId);
+    if (!response.success) {
+      reviewsLoadingState.value = LoadingState.hasError;
+      CustomToasts(
+        message: response.getErrorMessage(),
+        type: CustomToastType.error,
+      ).show();
+      return;
+    }
+    reviews.value = response.data ?? [];
+    reviewsLoadingState.value = reviews.isEmpty
+        ? LoadingState.doneWithNoData
+        : LoadingState.doneWithData;
   }
 
   Future<void> pickImage() async {

@@ -241,7 +241,7 @@ class AddEditProductPage extends GetView<ProductsPageController> {
                 AppButton(
                   onPressed: () => product == null
                       ? controller.addProduct()
-                      : controller.updateProduct(product!.productId),
+                      : controller.updateProduct(product!.productId.toString()),
                   text: product == null ? 'Add'.tr : 'Update'.tr,
                   backgroundColor: ColorManager.colorPrimary,
                   fontColor: ColorManager.colorWhite,

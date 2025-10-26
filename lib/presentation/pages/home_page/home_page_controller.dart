@@ -35,7 +35,9 @@ class HomePageController extends GetxController {
     ManageHomeModel(
       name: "ManageUsers".tr,
       icon: Assets.icons.userIcon,
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(AppRoutes.customersRoute);
+      },
     ),
   ];
 }

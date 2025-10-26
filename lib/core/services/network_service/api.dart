@@ -20,6 +20,9 @@ abstract class Api {
   /// drivers
   static const String drivers = "drivers";
 
+  ///customers
+  static const String customers = "customers";
+
   ///Categories
   static const String categories = "categories";
 

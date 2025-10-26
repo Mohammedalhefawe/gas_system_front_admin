@@ -305,5 +305,11 @@
   "PasswordConfirmation": "تاكيد كلمة المرور",
   "Blocked": "محظور",
   "VehicleNumber":"رقم المركبة",
-  "DriverOrders":"طلبات السائق"
+  "DriverOrders":"طلبات السائق",
+  "CustomerOrders":"طلبات الزبون",
+    "ProductReviews": "تقييمات المنتج",
+  "NoReviews": "لا توجد تقييمات",
+  "NoReviewsPrompt": "لا توجد تقييمات متاحة لهذا المنتج",
+  "FailedToLoadReviews": "فشل في تحميل التقييمات",
+  "ViewReviews": "عرض التقييمات"
 }
