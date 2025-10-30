@@ -7,7 +7,6 @@ import 'package:gas_admin_app/presentation/pages/delivery_fee_page/delivery_fee_
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 
 class DeliveryFeePage extends GetView<DeliveryFeePageController> {
   const DeliveryFeePage({super.key});

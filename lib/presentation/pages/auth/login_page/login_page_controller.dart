@@ -68,7 +68,7 @@ class LoginPageController extends GetxController {
 
   void selectPhoneNumber(String number) {
     formattedMobileNumber.value = number;
-    debugPrint(fullNumber);
+    // debugPrint(fullNumber);
   }
 
   String sanitizePhoneNumber(String number) {
