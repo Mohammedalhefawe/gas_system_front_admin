@@ -6,6 +6,8 @@ import 'package:gas_admin_app/presentation/pages/categories_page/categories_page
 import 'package:gas_admin_app/presentation/pages/categories_page/categories_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/customers/customers_page/customers_page.dart';
 import 'package:gas_admin_app/presentation/pages/customers/customers_page/customers_page_controller.dart';
+import 'package:gas_admin_app/presentation/pages/delivery_fee_page/delivery_fee_controller.dart';
+import 'package:gas_admin_app/presentation/pages/delivery_fee_page/delivery_fee_page.dart';
 import 'package:gas_admin_app/presentation/pages/drivers/drivers_page/drivers_page.dart';
 import 'package:gas_admin_app/presentation/pages/drivers/drivers_page/drivers_page_controller.dart';
 import 'package:gas_admin_app/presentation/pages/main_page/main_page.dart';
@@ -74,6 +76,11 @@ abstract class NavigationManager {
       page: () => CustomersPage(),
       binding: BindingsBuilder.put(() => CustomersPageController()),
     ),
+    GetPage(
+      name: AppRoutes.deliveryFeeRoute,
+      page: () => DeliveryFeePage(),
+      binding: BindingsBuilder.put(() => DeliveryFeePageController()),
+    ),
   ];
 }
 
@@ -94,4 +101,5 @@ abstract class AppRoutes {
   static const String driversRoute = "/driversRoute";
 
   static const String customersRoute = "/customersRoute";
+  static const String deliveryFeeRoute = "/deliveryFeeRoute";
 }

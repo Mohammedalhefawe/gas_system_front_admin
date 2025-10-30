@@ -29,4 +29,26 @@ class DeliveryFeeRepo extends GetxService {
     }
     return appResponse;
   }
+
+  Future<AppResponse<double>> updateDeliveryFee(double fee) async {
+    AppResponse<double> appResponse = AppResponse(success: false);
+
+    try {
+      final response = await apiService.request(
+        url: Api.deliveryFee,
+        method: Method.post,
+        requiredToken: true,
+        withLogging: true,
+        params: {'fee': fee},
+      );
+      appResponse.success = true;
+      appResponse.data = (response.data['data']['fee'] as num?)?.toDouble();
+      appResponse.successMessage =
+          response.data['message'] ?? 'Delivery fee updated successfully';
+    } catch (e) {
+      appResponse.success = false;
+      appResponse.networkFailure = ErrorHandler.handle(e).failure;
+    }
+    return appResponse;
+  }
 }

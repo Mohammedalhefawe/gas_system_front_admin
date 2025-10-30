@@ -23,23 +23,23 @@ class UsersRepo extends GetxService {
     Get.offAllNamed(AppRoutes.loginRoute);
   }
 
-  // void checkUserLoggedInState() {
-  //   userLoggedIn.value = cacheService.isLoggedIn();
-  //   if (userLoggedIn.value) {
-  //     loggedInUser.value = cacheService.getLoggedInUser();
-  //   } else {
-  //     loggedInUser.value = UserModel.emptyUser();
-  //   }
-  // }
+  void checkUserLoggedInState() {
+    userLoggedIn.value = cacheService.isLoggedIn();
+    if (userLoggedIn.value) {
+      loggedInUser.value = cacheService.getLoggedInUser();
+    } else {
+      loggedInUser.value = UserModel.emptyUser();
+    }
+  }
 
-  // Future<bool> checkLoggedInAndShowDialog() async {
-  //   bool isLoggedIn = userLoggedIn.value;
-  //   if (!isLoggedIn) {
-  //     await Get.toNamed(AppRoutes.registrationRoute);
-  //   }
-  //   isLoggedIn = userLoggedIn.value;
-  //   return isLoggedIn;
-  // }
+  Future<bool> checkLoggedInAndShowDialog() async {
+    bool isLoggedIn = userLoggedIn.value;
+    if (!isLoggedIn) {
+      await Get.toNamed(AppRoutes.loginRoute);
+    }
+    isLoggedIn = userLoggedIn.value;
+    return isLoggedIn;
+  }
 
   // void refreshUserObject(UserModel userModel) {
   //   cacheService.updateUserInfo(userModel);

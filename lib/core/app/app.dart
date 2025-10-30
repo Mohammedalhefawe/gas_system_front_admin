@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
       getPages: NavigationManager.getPages,
-      initialRoute: AppRoutes.mainRoute,
+      initialRoute: AppRoutes.splashRoute,
       fallbackLocale: const Locale('ar'),
       supportedLocales: AppTranslations.supportedLocales,
       localizationsDelegates: [

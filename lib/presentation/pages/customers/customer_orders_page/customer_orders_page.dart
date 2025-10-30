@@ -3,7 +3,6 @@ import 'package:gas_admin_app/data/enums/loading_state_enum.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
 import 'package:gas_admin_app/presentation/custom_widgets/normal_app_bar.dart';
 import 'package:gas_admin_app/presentation/pages/customers/customer_orders_page/customer_orders_controller.dart';
-import 'package:gas_admin_app/presentation/pages/drivers/driver_orders_page/driver_orders_page.dart';
 import 'package:gas_admin_app/presentation/pages/order_details_page/order_details_page.dart';
 import 'package:gas_admin_app/presentation/util/date_converter.dart'
     show DateConverter;
@@ -44,6 +43,8 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
           context,
           controller.myOrders,
           controller.myOrdersLoadingState,
+          controller.loadingMoreOrdersState,
+          controller.scrollController,
         ),
       ),
     );
@@ -53,6 +54,8 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
     BuildContext context,
     RxList<OrderModel> orders,
     Rx<LoadingState> loadingState,
+    Rx<LoadingState> loadingMoreState,
+    ScrollController scrollController,
   ) {
     return Obx(() {
       if (loadingState.value == LoadingState.loading) {
@@ -65,18 +68,33 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
         return _buildEmptyState();
       }
       return RefreshIndicator(
-        onRefresh: controller.fetchCustomerOrders,
+        onRefresh: controller.refreshCustomerOrders,
         color: ColorManager.colorPrimary,
         backgroundColor: ColorManager.colorWhite,
-        child: ListView.separated(
-          padding: const EdgeInsets.all(AppPadding.p12),
-          itemCount: orders.length,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppSize.s8),
-          itemBuilder: (context, index) {
-            final order = orders[index];
-            return _buildOrderCard(context, order);
-          },
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(AppPadding.p12),
+              sliver: SliverList.separated(
+                itemCount: orders.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSize.s8),
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  return _buildOrderCard(context, order);
+                },
+              ),
+            ),
+            if (loadingMoreState.value == LoadingState.loading)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSize.s10),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+            SliverToBoxAdapter(child: SizedBox(height: AppSize.s8)),
+          ],
         ),
       );
     });
@@ -118,11 +136,11 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
                   ),
                   const SizedBox(height: AppSize.s4),
                   Text(
-                    '${"TotalPrice".tr}  ${(double.parse(order.totalAmount) + double.parse(order.deliveryFee)).toStringAsFixed(0)} ${'SP'.tr}',
+                    '${"TotalPrice".tr} ${(double.parse(order.totalAmount) + double.parse(order.deliveryFee)).toStringAsFixed(0)} ${'SP'.tr}',
                     style: TextStyle(
                       fontSize: FontSize.s14,
-                      fontWeight: FontWeight.w600,
                       color: ColorManager.colorFontPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -157,7 +175,7 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
             ),
             const SizedBox(height: AppSize.s24),
             Text(
-              'NoDriverOrders'.tr,
+              'NoCustomerOrders'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: FontSize.s18,
@@ -192,7 +210,7 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
           ),
           const SizedBox(height: AppSize.s12),
           GestureDetector(
-            onTap: controller.fetchCustomerOrders,
+            onTap: controller.refreshCustomerOrders,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -219,56 +237,103 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage>
       child: Shimmer.fromColors(
         baseColor: ColorManager.colorGrey2.withValues(alpha: 0.3),
         highlightColor: ColorManager.colorGrey2.withValues(alpha: 0.1),
-        child: ListView.separated(
-          itemCount: 3,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppSize.s8),
-          itemBuilder: (context, index) => Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppSize.s12),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p16,
-                    vertical: AppPadding.p8,
-                  ),
-                  title: Container(width: 100, height: 16, color: Colors.white),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: AppSize.s8),
-                      Container(width: 150, height: 12, color: Colors.white),
-                      const SizedBox(height: AppSize.s8),
-                      Container(width: 100, height: 14, color: Colors.white),
-                    ],
-                  ),
-                  trailing: Container(
-                    width: 80,
-                    height: 30,
-                    color: Colors.white,
-                  ),
+        child: CustomScrollView(
+          slivers: [
+            SliverList.separated(
+              itemCount: 3,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSize.s8),
+              itemBuilder: (context, index) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppSize.s12),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p16,
-                    vertical: AppPadding.p8,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(width: 100, height: 40, color: Colors.white),
-                      const SizedBox(width: AppSize.s8),
-                      Container(width: 100, height: 40, color: Colors.white),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppPadding.p16,
+                        vertical: AppPadding.p8,
+                      ),
+                      title: Container(
+                        width: 100,
+                        height: 16,
+                        color: Colors.white,
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: AppSize.s8),
+                          Container(
+                            width: 150,
+                            height: 12,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: AppSize.s8),
+                          Container(
+                            width: 100,
+                            height: 14,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                      trailing: Container(
+                        width: 80,
+                        height: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
+}
+
+Widget buildStatusBadge(String status) {
+  final Map<String, Map<String, dynamic>> statusMap = {
+    'pending': {'color': ColorManager.colorPrimary, 'icon': Icons.access_time},
+    'accepted': {'color': Colors.blue, 'icon': Icons.thumb_up_outlined},
+    'rejected': {'color': Colors.red, 'icon': Icons.block},
+    'on_the_way': {'color': Colors.orange, 'icon': Icons.delivery_dining},
+    'completed': {'color': Colors.green, 'icon': Icons.check_circle_outline},
+    'cancelled': {'color': Colors.red, 'icon': Icons.cancel_outlined},
+  };
+
+  final statusData =
+      statusMap[status] ?? {'color': Colors.grey, 'icon': Icons.info_outline};
+
+  final Color color = statusData['color'];
+  final IconData icon = statusData['icon'];
+
+  return Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppPadding.p12,
+      vertical: AppPadding.p8,
+    ),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppSize.s20),
+      border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: AppSize.s14, color: color),
+        const SizedBox(width: AppSize.s4),
+        Text(
+          status.tr,
+          style: TextStyle(
+            fontSize: FontSize.s12,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    ),
+  );
 }

@@ -24,12 +24,16 @@ class SplashPageController extends GetxController
   @override
   void onInit() {
     animationController = AnimationController(vsync: this);
-    // usersRepo.checkUserLoggedInState();
+    usersRepo.checkUserLoggedInState();
     super.onInit();
   }
 
   Future<void> openNextPage() async {
-    Get.offAllNamed(AppRoutes.registrationRoute);
+    if (usersRepo.cacheService.isLoggedIn()) {
+      Get.offAllNamed(AppRoutes.mainRoute);
+    } else {
+      Get.offAllNamed(AppRoutes.loginRoute);
+    }
   }
 
   @override

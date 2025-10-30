@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:gas_admin_app/presentation/pages/main_page/main_page_controller.dart';
 import 'package:gas_admin_app/presentation/util/resources/assets.gen.dart';
 import 'package:gas_admin_app/presentation/util/resources/color_manager.dart';
-import 'package:gas_admin_app/presentation/util/resources/navigation_manager.dart';
 import 'package:gas_admin_app/presentation/util/resources/values_manager.dart';
 // import 'package:badges/badges.dart' as badges;
 
@@ -56,18 +55,18 @@ class MainPageAppBar extends GetView<MainController>
             ],
           ),
           actions: [
-            SizedBox(width: AppSize.sWidth * 0.06),
-            InkWell(
-              onTap: () async {
-                // if (await controller.usersRepo.checkLoggedInAndShowDialog()) {
-                //   Get.toNamed(AppRoutes.notificationsRoute);
-                // }
-              },
-              child: Assets.icons.notificationIcon.svg(
-                width: AppSize.sWidth * 0.065,
-              ),
-            ),
-            SizedBox(width: AppSize.sWidth * 0.06),
+            // SizedBox(width: AppSize.sWidth * 0.06),
+            // InkWell(
+            //   onTap: () async {
+            //     // if (await controller.usersRepo.checkLoggedInAndShowDialog()) {
+            //     //   Get.toNamed(AppRoutes.notificationsRoute);
+            //     // }
+            //   },
+            //   child: Assets.icons.notificationIcon.svg(
+            //     width: AppSize.sWidth * 0.065,
+            //   ),
+            // ),
+            // SizedBox(width: AppSize.sWidth * 0.06),
           ],
         );
       }
@@ -87,25 +86,25 @@ class MainPageAppBar extends GetView<MainController>
             ],
           ),*/
           actions: [
-            SizedBox(width: AppSize.sWidth * 0.035),
-            InkWell(
-              onTap: () async {
-                if (controller.cacheService.isLoggedIn()) {
-                  // Get.toNamed(AppRoutes.notificationsRoute);
-                } else {
-                  Get.toNamed(AppRoutes.registrationRoute);
-                }
-              },
-              child: Assets.icons.notificationIcon.svg(
-                width: AppSize.sWidth * 0.065,
-              ),
-            ),
-            SizedBox(width: AppSize.sWidth * 0.035),
-            InkWell(
-              onTap: () {},
-              child: Assets.icons.supportIcon.svg(width: AppSize.sWidth * 0.06),
-            ),
-            SizedBox(width: AppSize.sWidth * 0.035),
+            // SizedBox(width: AppSize.sWidth * 0.035),
+            // InkWell(
+            //   onTap: () async {
+            //     if (controller.cacheService.isLoggedIn()) {
+            //       // Get.toNamed(AppRoutes.notificationsRoute);
+            //     } else {
+            //       Get.toNamed(AppRoutes.registrationRoute);
+            //     }
+            //   },
+            //   child: Assets.icons.notificationIcon.svg(
+            //     width: AppSize.sWidth * 0.065,
+            //   ),
+            // ),
+            // SizedBox(width: AppSize.sWidth * 0.035),
+            // InkWell(
+            //   onTap: () {},
+            //   child: Assets.icons.supportIcon.svg(width: AppSize.sWidth * 0.06),
+            // ),
+            // SizedBox(width: AppSize.sWidth * 0.035),
           ],
         );
       }

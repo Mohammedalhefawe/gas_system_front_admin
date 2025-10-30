@@ -126,7 +126,6 @@ class ProductsPage extends GetView<ProductsPageController> {
             child: RefreshIndicator(
               onRefresh: controller.fetchProducts,
               color: ColorManager.colorPrimary,
-              backgroundColor: ColorManager.colorWhite,
               child: ListView.separated(
                 itemCount: controller.products.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 8),

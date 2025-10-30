@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DriverOrdersPage extends StatefulWidget {
-  final int? driverId; // Optional driverId for specific driver orders
+  final int? driverId;
 
   const DriverOrdersPage({super.key, this.driverId});
 
@@ -41,6 +41,8 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
           context,
           controller.myOrders,
           controller.myOrdersLoadingState,
+          controller.loadingMoreOrdersState,
+          controller.scrollController,
         ),
       ),
     );
@@ -50,6 +52,8 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
     BuildContext context,
     RxList<OrderModel> orders,
     Rx<LoadingState> loadingState,
+    Rx<LoadingState> loadingMoreState,
+    ScrollController scrollController,
   ) {
     return Obx(() {
       if (loadingState.value == LoadingState.loading) {
@@ -62,18 +66,33 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
         return _buildEmptyState();
       }
       return RefreshIndicator(
-        onRefresh: controller.fetchDriverOrders,
+        onRefresh: controller.refreshDriverOrders,
         color: ColorManager.colorPrimary,
         backgroundColor: ColorManager.colorWhite,
-        child: ListView.separated(
-          padding: const EdgeInsets.all(AppPadding.p12),
-          itemCount: orders.length,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppSize.s8),
-          itemBuilder: (context, index) {
-            final order = orders[index];
-            return _buildOrderCard(context, order);
-          },
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(AppPadding.p12),
+              sliver: SliverList.separated(
+                itemCount: orders.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSize.s8),
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  return _buildOrderCard(context, order);
+                },
+              ),
+            ),
+            if (loadingMoreState.value == LoadingState.loading)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSize.s10),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+            SliverToBoxAdapter(child: SizedBox(height: AppSize.s8)),
+          ],
         ),
       );
     });
@@ -115,11 +134,11 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
                   ),
                   const SizedBox(height: AppSize.s4),
                   Text(
-                    '${"TotalPrice".tr}  ${(double.parse(order.totalAmount) + double.parse(order.deliveryFee)).toStringAsFixed(0)} ${'SP'.tr}',
+                    '${"TotalPrice".tr} ${(double.parse(order.totalAmount) + double.parse(order.deliveryFee)).toStringAsFixed(0)} ${'SP'.tr}',
                     style: TextStyle(
                       fontSize: FontSize.s14,
-                      fontWeight: FontWeight.w600,
                       color: ColorManager.colorFontPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -189,7 +208,7 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
           ),
           const SizedBox(height: AppSize.s12),
           GestureDetector(
-            onTap: controller.fetchDriverOrders,
+            onTap: controller.refreshDriverOrders,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -216,54 +235,57 @@ class _DriverOrdersPageState extends State<DriverOrdersPage>
       child: Shimmer.fromColors(
         baseColor: ColorManager.colorGrey2.withValues(alpha: 0.3),
         highlightColor: ColorManager.colorGrey2.withValues(alpha: 0.1),
-        child: ListView.separated(
-          itemCount: 3,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppSize.s8),
-          itemBuilder: (context, index) => Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppSize.s12),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p16,
-                    vertical: AppPadding.p8,
-                  ),
-                  title: Container(width: 100, height: 16, color: Colors.white),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: AppSize.s8),
-                      Container(width: 150, height: 12, color: Colors.white),
-                      const SizedBox(height: AppSize.s8),
-                      Container(width: 100, height: 14, color: Colors.white),
-                    ],
-                  ),
-                  trailing: Container(
-                    width: 80,
-                    height: 30,
-                    color: Colors.white,
-                  ),
+        child: CustomScrollView(
+          slivers: [
+            SliverList.separated(
+              itemCount: 3,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSize.s8),
+              itemBuilder: (context, index) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppSize.s12),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p16,
-                    vertical: AppPadding.p8,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(width: 100, height: 40, color: Colors.white),
-                      const SizedBox(width: AppSize.s8),
-                      Container(width: 100, height: 40, color: Colors.white),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppPadding.p16,
+                        vertical: AppPadding.p8,
+                      ),
+                      title: Container(
+                        width: 100,
+                        height: 16,
+                        color: Colors.white,
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: AppSize.s8),
+                          Container(
+                            width: 150,
+                            height: 12,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: AppSize.s8),
+                          Container(
+                            width: 100,
+                            height: 14,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                      trailing: Container(
+                        width: 80,
+                        height: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

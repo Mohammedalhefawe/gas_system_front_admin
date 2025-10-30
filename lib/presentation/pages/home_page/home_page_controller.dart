@@ -39,6 +39,13 @@ class HomePageController extends GetxController {
         Get.toNamed(AppRoutes.customersRoute);
       },
     ),
+    ManageHomeModel(
+      name: "ManageDeliveryFee".tr,
+      icon: Assets.icons.moneyIcon,
+      onTap: () {
+        Get.toNamed(AppRoutes.deliveryFeeRoute);
+      },
+    ),
   ];
 }
 

@@ -20,7 +20,6 @@ class CustomersPage extends GetView<CustomersPageController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: NormalAppBar(title: 'ManageUsers'.tr, backIcon: true),
-
       body: Obx(() {
         if (controller.loadingState.value == LoadingState.loading) {
           return _buildShimmerGrid();
@@ -84,7 +83,7 @@ class CustomersPage extends GetView<CustomersPageController> {
           ),
           const SizedBox(height: AppSize.s12),
           GestureDetector(
-            onTap: controller.fetchCustomers,
+            onTap: controller.refreshCustomers,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -106,35 +105,50 @@ class CustomersPage extends GetView<CustomersPageController> {
   }
 
   Widget _buildGridView(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p16),
-      child: Column(
-        children: [
-          const SizedBox(height: AppSize.s8),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: controller.fetchCustomers,
-              color: ColorManager.colorPrimary,
-              backgroundColor: ColorManager.colorWhite,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: AppSize.s8,
-                  mainAxisSpacing: AppSize.s8,
-                  childAspectRatio: 1.2,
+    return Column(
+      children: [
+        const SizedBox(height: AppSize.s8),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: controller.refreshCustomers,
+            color: ColorManager.colorPrimary,
+            backgroundColor: ColorManager.colorWhite,
+            child: CustomScrollView(
+              controller: controller.scrollController,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p16,
+                  ),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: AppSize.s8,
+                      mainAxisSpacing: AppSize.s8,
+                      childAspectRatio: 1.2,
+                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final customer = controller.customers[index];
+                      return CustomerTile(data: customer);
+                    }, childCount: controller.customers.length),
+                  ),
                 ),
-                itemCount: controller.customers.length,
-                // separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final customer = controller.customers[index];
-                  return CustomerTile(data: customer);
-                },
-              ),
+                if (controller.loadingMoreCustomersState.value ==
+                    LoadingState.loading)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSize.s10,
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+                SliverToBoxAdapter(child: SizedBox(height: AppSize.s8)),
+              ],
             ),
           ),
-          const SizedBox(height: AppSize.s8),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -199,7 +213,6 @@ class CustomerTile extends GetView<CustomersPageController> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSize.s8),
-
           Text(
             data.user?.phoneNumber ?? "",
             textDirection: TextDirection.ltr,
@@ -278,7 +291,6 @@ class CustomerTile extends GetView<CustomersPageController> {
                 onPressed: () {
                   data.user?.phoneNumber.makePhoneCall();
                 },
-
                 label: 'Call'.tr,
               ),
             ],

@@ -27,8 +27,7 @@ abstract class Api {
   static const String categories = "categories";
 
   ///Orders
-  static const String orders = "customer/orders";
-  static const String myOrders = "customer/my-orders";
+  static const String orders = "orders";
 
   ///Delivery Fees
   static const String deliveryFee = "delivery-fee";

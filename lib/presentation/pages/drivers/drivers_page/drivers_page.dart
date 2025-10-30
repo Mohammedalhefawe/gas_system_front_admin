@@ -97,7 +97,7 @@ class DriversPage extends GetView<DriversPageController> {
           ),
           const SizedBox(height: AppSize.s12),
           GestureDetector(
-            onTap: controller.fetchDrivers,
+            onTap: controller.refreshDrivers,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -119,75 +119,102 @@ class DriversPage extends GetView<DriversPageController> {
   }
 
   Widget _buildGridView(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p16),
-      child: Column(
-        children: [
-          const SizedBox(height: AppSize.s8),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: controller.fetchDrivers,
-              color: ColorManager.colorPrimary,
-              backgroundColor: ColorManager.colorWhite,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: AppSize.s8,
-                  mainAxisSpacing: AppSize.s8,
-                  childAspectRatio: 0.9,
+    return Column(
+      children: [
+        const SizedBox(height: AppSize.s8),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: controller.refreshDrivers,
+            color: ColorManager.colorPrimary,
+            backgroundColor: ColorManager.colorWhite,
+            child: CustomScrollView(
+              controller: controller.scrollController,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p16,
+                  ),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: AppSize.s8,
+                      crossAxisSpacing: AppSize.s8,
+                      childAspectRatio: 1,
+                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final driver = controller.drivers[index];
+                      return DriverTile(data: driver);
+                    }, childCount: controller.drivers.length),
+                  ),
                 ),
-                itemCount: controller.drivers.length,
-                // separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final driver = controller.drivers[index];
-                  return DriverTile(data: driver);
-                },
-              ),
+                if (controller.loadingMoreDriversState.value ==
+                    LoadingState.loading)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSize.s10,
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+                SliverToBoxAdapter(child: SizedBox(height: AppSize.s8)),
+              ],
             ),
           ),
-          const SizedBox(height: AppSize.s8),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildShimmerGrid() {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p16,
-        vertical: AppPadding.p8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p16),
       child: Shimmer.fromColors(
         baseColor: ColorManager.colorGrey2.withValues(alpha: 0.3),
         highlightColor: ColorManager.colorGrey2.withValues(alpha: 0.1),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: AppSize.s8,
-            mainAxisSpacing: AppSize.s8,
-            childAspectRatio: 0.9,
-          ),
-          itemCount: 4,
-          itemBuilder: (context, index) {
-            return CardWidget(
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: AppSize.s100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(AppSize.s12),
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: AppSize.s12),
-                  Container(width: 100, height: 16, color: Colors.white),
-                  const SizedBox(height: AppSize.s8),
-                  Container(width: 80, height: 12, color: Colors.white),
-                ],
+        child: CustomScrollView(
+          slivers: [
+            SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: AppSize.s8,
+                crossAxisSpacing: AppSize.s8,
+                childAspectRatio: 1,
               ),
-            );
-          },
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppSize.s12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: AppSize.s8),
+                      Container(width: 100, height: 14, color: Colors.white),
+                      const SizedBox(height: AppSize.s8),
+                      Container(width: 80, height: 14, color: Colors.white),
+                      const SizedBox(height: AppSize.s16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(width: 80, height: 40, color: Colors.white),
+                          const SizedBox(width: AppSize.s8),
+                          Container(width: 80, height: 40, color: Colors.white),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                childCount: 4,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -215,7 +242,6 @@ class DriverTile extends GetView<DriversPageController> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSize.s8),
-
           Text(
             data.user.phoneNumber,
             textDirection: TextDirection.ltr,
@@ -223,16 +249,6 @@ class DriverTile extends GetView<DriversPageController> {
               color: ColorManager.colorDoveGray600,
               fontSize: FontSize.s12,
             ),
-          ),
-          const SizedBox(height: AppSize.s8),
-          Text(
-            '${'VehicleType'.tr}: ${data.vehicleType}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: ColorManager.colorDoveGray600,
-              fontSize: FontSize.s12,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSize.s8),
           Text(
@@ -311,7 +327,6 @@ class DriverTile extends GetView<DriversPageController> {
                 onPressed: () {
                   data.user.phoneNumber.makePhoneCall();
                 },
-
                 label: 'Call'.tr,
               ),
             ],

@@ -9,6 +9,11 @@ class DriversPageController extends GetxController {
   final DriversRepo driversRepo = Get.find<DriversRepo>();
   final drivers = <DriverModel>[].obs;
   final loadingState = LoadingState.idle.obs;
+  final loadingMoreDriversState = LoadingState.idle.obs;
+  final currentPage = 1.obs;
+  final lastPage = 1.obs;
+  final hasMorePages = false.obs;
+  final ScrollController scrollController = ScrollController();
 
   // Form controllers
   final TextEditingController fullNameController = TextEditingController();
@@ -31,13 +36,36 @@ class DriversPageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchDrivers();
+    fetchDrivers(page: 1);
+    scrollController.addListener(scrollListener);
   }
 
-  Future<void> fetchDrivers() async {
+  @override
+  void onClose() {
+    scrollController.dispose();
+    fullNameController.dispose();
+    phoneNumberController.dispose();
+    passwordController.dispose();
+    passwordConfirmationController.dispose();
+    vehicleTypeController.dispose();
+    licenseNumberController.dispose();
+    maxCapacityController.dispose();
+    super.onClose();
+  }
+
+  void scrollListener() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent * 0.8) {
+      loadMoreDrivers();
+    }
+  }
+
+  Future<void> fetchDrivers({required int page, int perPage = 10}) async {
+    if (loadingState.value == LoadingState.loading) return;
     loadingState.value = LoadingState.loading;
-    final response = await driversRepo.getDrivers();
-    if (!response.success) {
+
+    final response = await driversRepo.getDrivers(page: page, perPage: perPage);
+    if (!response.success || response.data == null) {
       loadingState.value = LoadingState.hasError;
       CustomToasts(
         message: response.getErrorMessage(),
@@ -45,10 +73,52 @@ class DriversPageController extends GetxController {
       ).show();
       return;
     }
-    drivers.value = response.data ?? [];
+
+    if (page == 1) {
+      drivers.clear();
+    }
+    drivers.addAll(response.data!.data);
+    currentPage.value = response.data!.currentPage;
+    lastPage.value = response.data!.lastPage;
+    hasMorePages.value = currentPage.value < lastPage.value;
+
     loadingState.value = drivers.isEmpty
         ? LoadingState.doneWithNoData
         : LoadingState.doneWithData;
+  }
+
+  Future<void> loadMoreDrivers() async {
+    if (loadingMoreDriversState.value == LoadingState.loading ||
+        !hasMorePages.value) {
+      return;
+    }
+
+    loadingMoreDriversState.value = LoadingState.loading;
+
+    final nextPage = currentPage.value + 1;
+    final response = await driversRepo.getDrivers(page: nextPage);
+
+    if (!response.success || response.data == null) {
+      loadingMoreDriversState.value = LoadingState.hasError;
+      return;
+    }
+
+    drivers.addAll(response.data!.data);
+    currentPage.value = response.data!.currentPage;
+    lastPage.value = response.data!.lastPage;
+    hasMorePages.value = currentPage.value < lastPage.value;
+
+    loadingMoreDriversState.value = LoadingState.doneWithData;
+  }
+
+  Future<void> refreshDrivers() async {
+    drivers.clear();
+    currentPage.value = 1;
+    lastPage.value = 1;
+    hasMorePages.value = false;
+    loadingState.value = LoadingState.idle;
+    loadingMoreDriversState.value = LoadingState.idle;
+    await fetchDrivers(page: 1);
   }
 
   Future<void> addDriver() async {
@@ -92,8 +162,7 @@ class DriversPageController extends GetxController {
       ).show();
       return;
     }
-    fetchDrivers();
-    loadingState.value = LoadingState.doneWithData;
+    await refreshDrivers();
     clearForm();
     Get.back();
     CustomToasts(
@@ -148,17 +217,5 @@ class DriversPageController extends GetxController {
     licenseNumberController.clear();
     maxCapacityController.clear();
     formattedMobileNumber.value = '';
-  }
-
-  @override
-  void onClose() {
-    fullNameController.dispose();
-    phoneNumberController.dispose();
-    passwordController.dispose();
-    passwordConfirmationController.dispose();
-    vehicleTypeController.dispose();
-    licenseNumberController.dispose();
-    maxCapacityController.dispose();
-    super.onClose();
   }
 }

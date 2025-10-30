@@ -313,5 +313,14 @@
   "NoReviews": "No Reviews",
   "NoReviewsPrompt": "No reviews available for this product",
   "FailedToLoadReviews": "Failed to load reviews",
-  "ViewReviews": "View Reviews"
+  "ViewReviews": "View Reviews",
+  "ManageDeliveryFee": "Manage Delivery Fee",
+  "UpdateDeliveryFee": "Update Delivery Fee",
+  "EnterDeliveryFee": "Enter delivery fee amount",
+  "FeeRequired": "Delivery fee is required",
+  "InvalidFeeFormat": "Please enter a valid number for the fee",
+  "DeliveryFeeUpdated": "Delivery fee updated successfully",
+  "FailedToLoad": "Failed to load delivery fee"
+  
+
 }

@@ -176,27 +176,12 @@ class $AssetsIconsGen {
   /// File path: assets/icons/home_icon.svg
   SvgGenImage get homeIcon => const SvgGenImage('assets/icons/home_icon.svg');
 
-  /// File path: assets/icons/image_add_icon.svg
-  SvgGenImage get imageAddIcon =>
-      const SvgGenImage('assets/icons/image_add_icon.svg');
-
   /// File path: assets/icons/image_icon.svg
   SvgGenImage get imageIcon => const SvgGenImage('assets/icons/image_icon.svg');
 
   /// File path: assets/icons/language_icon.svg
   SvgGenImage get languageIcon =>
       const SvgGenImage('assets/icons/language_icon.svg');
-
-  /// File path: assets/icons/layout_grid_icon.svg
-  SvgGenImage get layoutGridIcon =>
-      const SvgGenImage('assets/icons/layout_grid_icon.svg');
-
-  /// File path: assets/icons/layout_list_icon.svg
-  SvgGenImage get layoutListIcon =>
-      const SvgGenImage('assets/icons/layout_list_icon.svg');
-
-  /// File path: assets/icons/link_icon.svg
-  SvgGenImage get linkIcon => const SvgGenImage('assets/icons/link_icon.svg');
 
   /// File path: assets/icons/location_icon.svg
   SvgGenImage get locationIcon =>
@@ -219,6 +204,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/mobile_icon.svg
   SvgGenImage get mobileIcon =>
       const SvgGenImage('assets/icons/mobile_icon.svg');
+
+  /// File path: assets/icons/money_icon.svg
+  SvgGenImage get moneyIcon => const SvgGenImage('assets/icons/money_icon.svg');
 
   /// File path: assets/icons/more_icon.svg
   SvgGenImage get moreIcon => const SvgGenImage('assets/icons/more_icon.svg');
@@ -294,30 +282,8 @@ class $AssetsIconsGen {
   SvgGenImage get userAccountIcon =>
       const SvgGenImage('assets/icons/user_account_icon.svg');
 
-  /// File path: assets/icons/user_follow2_icon.svg
-  SvgGenImage get userFollow2Icon =>
-      const SvgGenImage('assets/icons/user_follow2_icon.svg');
-
-  /// File path: assets/icons/user_follow_icon.svg
-  SvgGenImage get userFollowIcon =>
-      const SvgGenImage('assets/icons/user_follow_icon.svg');
-
-  /// File path: assets/icons/user_group_icon.svg
-  SvgGenImage get userGroupIcon =>
-      const SvgGenImage('assets/icons/user_group_icon.svg');
-
   /// File path: assets/icons/user_icon.svg
   SvgGenImage get userIcon => const SvgGenImage('assets/icons/user_icon.svg');
-
-  /// File path: assets/icons/view_icon.svg
-  SvgGenImage get viewIcon => const SvgGenImage('assets/icons/view_icon.svg');
-
-  /// File path: assets/icons/whatsapp_icon.svg
-  SvgGenImage get whatsappIcon =>
-      const SvgGenImage('assets/icons/whatsapp_icon.svg');
-
-  /// File path: assets/icons/works_icon.svg
-  SvgGenImage get worksIcon => const SvgGenImage('assets/icons/works_icon.svg');
 
   /// List of all assets
   List<SvgGenImage> get values => [
@@ -358,18 +324,15 @@ class $AssetsIconsGen {
     genderIcon,
     helpIcon,
     homeIcon,
-    imageAddIcon,
     imageIcon,
     languageIcon,
-    layoutGridIcon,
-    layoutListIcon,
-    linkIcon,
     locationIcon,
     locationPin,
     loginIcon,
     logoutIcon,
     mailIcon,
     mobileIcon,
+    moneyIcon,
     moreIcon,
     motorIcon,
     notificationIcon,
@@ -390,72 +353,18 @@ class $AssetsIconsGen {
     unFollowIcon,
     uploadIcon,
     userAccountIcon,
-    userFollow2Icon,
-    userFollowIcon,
-    userGroupIcon,
     userIcon,
-    viewIcon,
-    whatsappIcon,
-    worksIcon,
   ];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
-  /// File path: assets/images/Quick-sale-logo.png
-  AssetGenImage get quickSaleLogo =>
-      const AssetGenImage('assets/images/Quick-sale-logo.png');
-
-  /// File path: assets/images/background_chat2.jpg
-  AssetGenImage get backgroundChat2 =>
-      const AssetGenImage('assets/images/background_chat2.jpg');
-
-  /// File path: assets/images/car.png
-  AssetGenImage get car => const AssetGenImage('assets/images/car.png');
-
-  /// File path: assets/images/category.png
-  AssetGenImage get category =>
-      const AssetGenImage('assets/images/category.png');
-
-  /// File path: assets/images/cv.png
-  AssetGenImage get cv => const AssetGenImage('assets/images/cv.png');
-
-  /// File path: assets/images/empty_ads.png
-  AssetGenImage get emptyAds =>
-      const AssetGenImage('assets/images/empty_ads.png');
-
-  /// File path: assets/images/error_place_holder.png
-  AssetGenImage get errorPlaceHolder =>
-      const AssetGenImage('assets/images/error_place_holder.png');
-
-  /// File path: assets/images/logo.png
-  AssetGenImage get logo => const AssetGenImage('assets/images/logo.png');
-
-  /// File path: assets/images/reviews.png
-  AssetGenImage get reviews => const AssetGenImage('assets/images/reviews.png');
-
-  /// File path: assets/images/smartphone.png
-  AssetGenImage get smartphone =>
-      const AssetGenImage('assets/images/smartphone.png');
-
   /// File path: assets/images/user.png
   AssetGenImage get user => const AssetGenImage('assets/images/user.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [
-    quickSaleLogo,
-    backgroundChat2,
-    car,
-    category,
-    cv,
-    emptyAds,
-    errorPlaceHolder,
-    logo,
-    reviews,
-    smartphone,
-    user,
-  ];
+  List<AssetGenImage> get values => [user];
 }
 
 class Assets {

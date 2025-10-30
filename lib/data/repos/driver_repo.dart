@@ -4,14 +4,20 @@ import 'package:gas_admin_app/core/services/network_service/remote_api_service.d
 import 'package:gas_admin_app/data/models/app_response.dart';
 import 'package:gas_admin_app/data/models/driver_model.dart';
 import 'package:gas_admin_app/data/models/order_model.dart';
+import 'package:gas_admin_app/data/models/paginated_model.dart';
 
 import 'package:get/get.dart';
 
 class DriversRepo extends GetxService {
   final ApiService apiService = Get.find<ApiService>();
 
-  Future<AppResponse<List<DriverModel>>> getDrivers() async {
-    AppResponse<List<DriverModel>> appResponse = AppResponse(success: false);
+  Future<AppResponse<PaginatedModel<DriverModel>>> getDrivers({
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    AppResponse<PaginatedModel<DriverModel>> appResponse = AppResponse(
+      success: false,
+    );
 
     try {
       final response = await apiService.request(
@@ -19,16 +25,21 @@ class DriversRepo extends GetxService {
         method: Method.get,
         requiredToken: true,
         withLogging: true,
+        queryParameters: {'page': page, 'per_page': perPage},
       );
+
       appResponse.success = true;
-      appResponse.data = (response.data?['data']?['drivers'] as List<dynamic>?)
-          ?.map((e) => DriverModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      appResponse.data = PaginatedModel<DriverModel>.fromJson(
+        response.data,
+        (item) => DriverModel.fromJson(item),
+      );
+
       appResponse.successMessage = response.data['message'];
     } catch (e) {
       appResponse.success = false;
       appResponse.networkFailure = ErrorHandler.handle(e).failure;
     }
+
     return appResponse;
   }
 
@@ -75,8 +86,14 @@ class DriversRepo extends GetxService {
     return appResponse;
   }
 
-  Future<AppResponse<List<OrderModel>>> getDriverOrders(int driverId) async {
-    AppResponse<List<OrderModel>> appResponse = AppResponse(success: false);
+  Future<AppResponse<PaginatedModel<OrderModel>>> getDriverOrders(
+    int driverId, {
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    AppResponse<PaginatedModel<OrderModel>> appResponse = AppResponse(
+      success: false,
+    );
 
     try {
       final response = await apiService.request(
@@ -84,16 +101,21 @@ class DriversRepo extends GetxService {
         method: Method.get,
         requiredToken: true,
         withLogging: true,
+        queryParameters: {'page': page, 'per_page': perPage},
       );
+
       appResponse.success = true;
-      appResponse.data = (response.data?['data']?['orders'] as List<dynamic>?)
-          ?.map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      appResponse.data = PaginatedModel<OrderModel>.fromJson(
+        response.data,
+        (item) => OrderModel.fromJson(item),
+      );
+
       appResponse.successMessage = response.data['message'];
     } catch (e) {
       appResponse.success = false;
       appResponse.networkFailure = ErrorHandler.handle(e).failure;
     }
+
     return appResponse;
   }
 }

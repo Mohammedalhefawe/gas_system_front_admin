@@ -1,39 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:gas_admin_app/core/services/cache_service.dart';
+import 'package:gas_admin_app/core/app_config/app_translation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class DateConverter {
   static DateTime? stringToDate(String? dateString, {String? format}) {
-    if (dateString == null) {
-      return null;
-    }
+    if (dateString == null) return null;
 
-    DateTime utcTime = DateFormat(
-      format ?? "yyyy-MM-ddTHH:mm:ss",
-    ).parse(dateString, true);
-    DateTime localTime = utcTime.toLocal();
-    return localTime;
+    try {
+      // نحاول نقرأ التاريخ الكامل
+      DateTime utcTime = DateFormat(
+        format ?? "yyyy-MM-ddTHH:mm:ss",
+      ).parse(dateString, true);
+      return utcTime.toLocal();
+    } catch (_) {
+      try {
+        // إذا فيها وقت فقط، نضيف تاريخ افتراضي اليوم
+        DateTime timeOnly = DateFormat("HH:mm:ss").parse(dateString);
+        DateTime now = DateTime.now();
+        return DateTime(
+          now.year,
+          now.month,
+          now.day,
+          timeOnly.hour,
+          timeOnly.minute,
+          timeOnly.second,
+        );
+      } catch (_) {
+        return null; // صيغة غير صالحة
+      }
+    }
   }
 
   static String formatTimeOnly(String serverString) {
-    DateTime dateTime;
+    DateTime? dateTime = stringToDate(serverString, format: "HH:mm:ss");
+    if (dateTime == null) return serverString;
 
-    try {
-      // إذا فيها تاريخ + وقت
-      dateTime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(serverString);
-    } catch (e) {
-      try {
-        // إذا فيها وقت فقط
-        dateTime = DateFormat("HH:mm:ss").parse(serverString);
-      } catch (e) {
-        // غير صالح، نرجع نفس الـString بدون تعديل
-        return serverString;
-      }
-    }
     String result = DateFormat("hh:mm a").format(dateTime);
-    // نرجع الوقت فقط بصيغة 12 ساعة مع ص/م
-    if (Get.find<CacheService>().getLanguage() == 'en') return result;
+    if (!AppTranslations.isArabic) return result;
     return result.replaceAll('AM', 'ص').replaceAll('PM', 'م');
   }
 

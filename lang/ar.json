@@ -311,5 +311,13 @@
   "NoReviews": "لا توجد تقييمات",
   "NoReviewsPrompt": "لا توجد تقييمات متاحة لهذا المنتج",
   "FailedToLoadReviews": "فشل في تحميل التقييمات",
-  "ViewReviews": "عرض التقييمات"
+  "ViewReviews": "عرض التقييمات",
+  "ManageDeliveryFee": "إدارة رسوم التوصيل",
+  "UpdateDeliveryFee": "تحديث رسوم التوصيل",
+  "EnterDeliveryFee": "أدخل مبلغ رسوم التوصيل",
+  "FeeRequired": "رسوم التوصيل مطلوبة",
+  "InvalidFeeFormat": "يرجى إدخال رقم صالح للرسوم",
+  "DeliveryFeeUpdated": "تم تحديث رسوم التوصيل بنجاح",
+  "FailedToLoad": "فشل في تحميل رسوم التوصيل",
+  "NoCustomerOrders":"لا توجد طلبات لهذا الزبون"
 }
